@@ -321,25 +321,14 @@ function getProjectStatus(row, clientName) {
   if (st.includes('paid') && !st.includes('not')) return 'paid';
   if (st.includes('not paid') || st.includes('unpaid'))  return 'unpaid';
 
-  // Specific baseline parameters do not apply to BullionFX structural checks
-  if (clientName !== "BullionFX") {
-    const hasFrame = row.frame && row.frame.trim() && (row.frame.startsWith('http://') || row.frame.startsWith('https://'));
-    if (!hasFrame) return 'pending';
+  // If there is any string content in the revised column, it is treated as exported
+  const hasRevised = row.revised && row.revised.trim();
+  if (hasRevised) return 'exported';
 
-    const hasRevised = row.revised && row.revised.trim() && (row.revised.startsWith('http://') || row.revised.startsWith('https://'));
-    if (hasRevised) return 'exported';
-    
-    return 'checking';
-  } else {
-    // Historical BullionFX structural logic tracking fallback
-    const hasRevised = row.revised && row.revised.trim();
-    if (hasRevised) return 'exported';
+  const hasFrame = row.frame && row.frame.trim();
+  if (hasFrame) return 'checking';
 
-    const hasFrame = row.frame && row.frame.trim();
-    if (hasFrame) return 'checking';
-
-    return 'pending';
-  }
+  return 'pending';
 }
 
 // ── CSV HELPERS ───────────────────────────────────────────────────────────
@@ -647,7 +636,6 @@ function renderClient(clientName) {
   const tableRows = filtered.map(r => {
     const ps = getProjectStatus(r, clientName);
     
-    // Evaluate operational targets to extract clickable link resources
     let targetLink = (r.revised || r.frame || '').trim();
     let hasValidLink = targetLink.startsWith('http://') || targetLink.startsWith('https://');
     let linkColumnMarkup = hasValidLink
