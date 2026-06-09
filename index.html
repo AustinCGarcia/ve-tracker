@@ -101,6 +101,8 @@
     border-radius: 12px; padding: 20px 24px; flex: 1; min-width: 140px;
     position: relative; overflow: hidden;
   }
+  .stat-card.clickable { cursor: pointer; transition: transform 0.15s, border-color 0.15s; }
+  .stat-card.clickable:hover { transform: translateY(-2px); border-color: var(--text2); }
   .stat-card.earnings { border-color: rgba(245,166,35,0.35); }
   .stat-card::before {
     content: ''; position: absolute; top: 0; left: 0; right: 0;
@@ -110,14 +112,16 @@
   .stat-card.paid::before { background: linear-gradient(90deg, var(--green), transparent); }
   .stat-card.unpaid::before { background: linear-gradient(90deg, var(--red), transparent); }
   .stat-card.total::before { background: linear-gradient(90deg, var(--blue), transparent); }
-  .stat-card.editing::before { background: linear-gradient(90deg, var(--purple), transparent); }
+  .stat-card.pending-card::before { background: linear-gradient(90deg, var(--purple), transparent); }
+  .stat-card.checking-card::before { background: linear-gradient(90deg, var(--amber), transparent); }
   .stat-label { font-size: 11px; letter-spacing: 1.5px; color: var(--muted); text-transform: uppercase; margin-bottom: 10px; }
   .stat-value { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 1px; line-height: 1; }
   .stat-card.earnings .stat-value { color: var(--gold); font-size: 44px; }
   .stat-card.paid .stat-value { color: var(--green); }
   .stat-card.unpaid .stat-value { color: var(--red); }
   .stat-card.total .stat-value { color: var(--blue); }
-  .stat-card.editing .stat-value { color: var(--purple); }
+  .stat-card.pending-card .stat-value { color: var(--purple); }
+  .stat-card.checking-card .stat-value { color: var(--amber); }
   .stat-sub { font-size: 11px; color: var(--muted); margin-top: 6px; }
 
   /* HERO */
@@ -133,6 +137,8 @@
   .hero-sub { font-size: 14px; color: var(--muted); margin-top: 12px; letter-spacing: 1px; }
   .hero-breakdown { display: flex; justify-content: center; gap: 40px; margin-top: 40px; flex-wrap: wrap; }
   .hero-stat { text-align: center; }
+  .hero-stat.clickable { cursor: pointer; }
+  .hero-stat.clickable:hover .hero-stat-val { opacity: 0.8; }
   .hero-stat-val { font-family: 'Bebas Neue', sans-serif; font-size: 32px; color: var(--text); }
   .hero-stat-val.g { color: var(--green); }
   .hero-stat-val.r { color: var(--red); }
@@ -182,7 +188,7 @@
   .badge-unpaid   { background: rgba(239,68,68,0.12);  color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
   .badge-done     { background: rgba(96,165,250,0.12); color: #60a5fa; border: 1px solid rgba(96,165,250,0.2); }
   .badge-checking { background: rgba(251,191,36,0.12); color: #fbbf24; border: 1px solid rgba(251,191,36,0.2); }
-  .badge-editing  { background: rgba(167,139,250,0.12);color: #a78bfa; border: 1px solid rgba(167,139,250,0.2); }
+  .badge-pending  { background: rgba(167,139,250,0.12);color: #a78bfa; border: 1px solid rgba(167,139,250,0.2); }
 
   .editor-tag { display: inline-block; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; }
   .editor-aus  { background: rgba(217,119,6,0.15);  color: #d97706; }
@@ -227,7 +233,7 @@
       <div class="sub">Earnings Tracker</div>
     </div>
     <div class="sidebar-section">Overview</div>
-    <div class="nav-item active" data-tab="home" onclick="switchTab('home')">
+    <div class="nav-item active" id="nav-home" onclick="switchTab('home')">
       <div class="dot" style="background:var(--gold)"></div>
       <span>Dashboard</span>
     </div>
@@ -245,11 +251,14 @@
   <main class="main" id="main-content">
     <div id="page-home"></div>
     <div id="page-client" style="display:none"></div>
+    <div id="page-summary" style="display:none"></div>
   </main>
 </div>
 
 <script>
-const RATE_PER_VIDEO = 500;
+const STANDARD_RATE = 500;
+const BULLION_RATE = 400;
+
 let allData = {};
 let activeTab = 'home';
 let activeEditor = 'all';
@@ -264,19 +273,30 @@ const CLIENTS = [
   { name: "Goreng Story",  sheet: "1xU1qVfUaCwj5cVlvdY-SKnU4Cw2MqgV2mDA-OlgQgX0", gid: "210567726" }
 ];
 
+function getRate(clientName) {
+  return clientName === "BullionFX" ? BULLION_RATE : STANDARD_RATE;
+}
+
 // ── STATUS LOGIC ───────────────────────────────────────────────────────────
 function getProjectStatus(row, clientName) {
   const st = (row.status || '').toUpperCase();
   
+  // Custom tracking logic exceptions for BullionFX
+  if (clientName === "BullionFX") {
+    if (st.includes('PAID') && !st.includes('NOT')) return 'paid';
+    if (st.includes('NOT PAID')) return 'unpaid';
+    if (row.exported && row.exported.trim()) return 'checking';
+    return 'pending';
+  }
+
+  // Universal Logic for other clients
   if (st.includes('PAID') && !st.includes('NOT')) return 'paid';
-  if (st.includes('NOT PAID'))                     return 'unpaid';
-  if (row.revised && row.revised.trim())           return 'done';
+  if (st.includes('NOT PAID')) return 'unpaid';
+  if (row.revised && row.revised.trim() && (row.revised.startsWith('http://') || row.revised.startsWith('https://'))) return 'done';
+  if (row.exported && row.exported.trim()) return 'checking';
+  if (!row.frame || !row.frame.trim()) return 'pending';
   
-  // Custom case: BullionFX is complete if status is paid, even with no revised link
-  if (clientName === "BullionFX" && st.includes('PAID')) return 'paid';
-  
-  if (row.exported && row.exported.trim())         return 'checking';
-  return 'editing';
+  return 'pending'; 
 }
 
 async function fetchSheet(sheetId, gid) {
@@ -292,7 +312,6 @@ function parseCSVForClient(text, clientName) {
   const lines = text.split('\n').filter(l => l.trim());
   if (lines.length < 2) return [];
   const rows = [];
-  
   const normName = clientName.toUpperCase();
   
   for (let i = 1; i < lines.length; i++) {
@@ -302,7 +321,6 @@ function parseCSVForClient(text, clientName) {
     let parsedRow = { date: '', editor: '', project: '', reference: '', frame: '', exported: '', revised: '', status: '' };
     
     if (normName === "LHF" || normName === "L&S") {
-      // Layout: Date(0) | Editor(1) | Project(2) | Frame(3) | Export(4) | Revised(5) | Status(6)
       parsedRow.date     = c[0]?.trim() || '';
       parsedRow.editor   = c[1]?.trim() || '';
       parsedRow.project  = c[2]?.trim() || '';
@@ -311,8 +329,6 @@ function parseCSVForClient(text, clientName) {
       parsedRow.revised  = c[5]?.trim() || '';
       parsedRow.status   = (c[6]?.trim() || '').toUpperCase();
     } else {
-      // Standard Layout (Boney, Jeya, AM Market, BullionFX, Goreng Story):
-      // Date(0) | Editor(1) | Project(2) | Reference(3) | Frame(4) | Export(5) | Revised(6) | Status(7)
       parsedRow.date     = c[0]?.trim() || '';
       parsedRow.editor   = c[1]?.trim() || '';
       parsedRow.project  = c[2]?.trim() || '';
@@ -364,50 +380,53 @@ function filterRows(rows) {
 
 function computeStats(rows, clientName) {
   const f = filterRows(rows);
-  let paid=0, unpaid=0, done=0, checking=0, editing=0;
+  const rate = getRate(clientName);
+  let paid=0, unpaid=0, done=0, checking=0, pending=0;
   for (const r of f) {
     const s = getProjectStatus(r, clientName);
     if (s==='paid')     paid++;
     if (s==='unpaid')   unpaid++;
     if (s==='done')     done++;
     if (s==='checking') checking++;
-    if (s==='editing')  editing++;
+    if (s==='pending')  pending++;
   }
-  return { total:f.length, paid, unpaid, done, checking, editing,
-    earnings: paid*RATE_PER_VIDEO, pending: unpaid*RATE_PER_VIDEO };
+  return { total:f.length, paid, unpaid, done, checking, pending,
+    earnings: paid*rate, pendingAmount: unpaid*rate };
 }
 
 function computeGlobal() {
-  let total=0, paid=0, unpaid=0, done=0, checking=0, editing=0;
+  let total=0, paid=0, unpaid=0, done=0, checking=0, pending=0, earnings=0, pendingAmount=0;
   const editorMap = {};
   for (const [clientName, rows] of Object.entries(allData)) {
     const f = filterRows(rows);
+    const rate = getRate(clientName);
     for (const r of f) {
       total++;
       const s = getProjectStatus(r, clientName);
-      if (s==='paid')     paid++;
-      if (s==='unpaid')   unpaid++;
+      if (s==='paid') { paid++; earnings += rate; }
+      if (s==='unpaid') { unpaid++; pendingAmount += rate; }
       if (s==='done')     done++;
       if (s==='checking') checking++;
-      if (s==='editing')  editing++;
+      if (s==='pending')  pending++;
+      
       const ed = r.editor || 'Unknown';
-      if (!editorMap[ed]) editorMap[ed] = { paid:0, unpaid:0, done:0, checking:0, editing:0 };
+      if (!editorMap[ed]) editorMap[ed] = { paid:0, unpaid:0, done:0, checking:0, pending:0, earnings:0 };
       editorMap[ed][s]++;
+      if (s==='paid') editorMap[ed].earnings += rate;
     }
   }
-  return { total, paid, unpaid, done, checking, editing,
-    earnings: paid*RATE_PER_VIDEO, pending: unpaid*RATE_PER_VIDEO, editorMap };
+  return { total, paid, unpaid, done, checking, pending, earnings, pendingAmount, editorMap };
 }
 
 function badgeHTML(status) {
   const map = {
     paid:     ['badge-paid',     '✓ Paid'],
     unpaid:   ['badge-unpaid',   '✕ Not Paid'],
-    done:     ['badge-done',     '✔ Delivered'],
+    done:     ['badge-done',     '✓ Delivered'],
     checking: ['badge-checking', '⏳ For Checking'],
-    editing:  ['badge-editing',  '✏ Editing'],
+    pending:  ['badge-pending',  '⏳ Pending'],
   };
-  const [cls, label] = map[status] || ['badge-editing', status];
+  const [cls, label] = map[status] || ['badge-pending', status];
   return `<span class="badge ${cls}">${label}</span>`;
 }
 
@@ -438,6 +457,7 @@ function setEditor(name) { activeEditor = name; renderAll(); }
 function renderAll() {
   renderSidebar();
   if (activeTab === 'home') renderHome();
+  else if (activeTab === 'summary-pending' || activeTab === 'summary-checking') renderSummaryPage(activeTab);
   else renderClient(activeTab);
 }
 
@@ -445,6 +465,9 @@ function renderSidebar() {
   const nav = document.getElementById('client-nav');
   const clients = Object.keys(allData);
   const colors = ['#60a5fa','#f472b6','#34d399','#a78bfa','#fb923c','#e879f9'];
+  
+  document.getElementById('nav-home').className = (activeTab === 'home') ? 'nav-item active' : 'nav-item';
+  
   nav.innerHTML = clients.map((c, i) => {
     const rows = filterRows(allData[c]);
     const active = activeTab === c ? 'active' : '';
@@ -459,21 +482,22 @@ function renderSidebar() {
 function switchTab(tab) { activeTab = tab; renderAll(); window.scrollTo(0,0); }
 
 function renderHome() {
-  const g = computeGlobal();
-  const editors = getEditors();
   document.getElementById('page-client').style.display = 'none';
+  document.getElementById('page-summary').style.display = 'none';
   const el = document.getElementById('page-home');
   el.style.display = '';
+
+  const g = computeGlobal();
+  const editors = getEditors();
 
   const editorCards = editors.map(ed => {
     if (activeEditor !== 'all' && activeEditor !== ed) return '';
     const info = g.editorMap[ed] || {};
-    const edPaid = info.paid || 0;
-    const inProgress = (info.editing||0) + (info.checking||0) + (info.done||0);
+    const inProgress = (info.pending||0) + (info.checking||0) + (info.done||0);
     return `<div class="editor-card">
       <div class="editor-card-name">${ed}</div>
-      <div class="editor-card-amt"><span class="peso">₱</span>${(edPaid * RATE_PER_VIDEO).toLocaleString()}</div>
-      <div style="font-size:11px;color:var(--muted);margin-top:4px">${edPaid} paid · ${info.unpaid||0} unpaid · ${inProgress} in progress</div>
+      <div class="editor-card-amt"><span class="peso">₱</span>${(info.earnings || 0).toLocaleString()}</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">${info.paid||0} paid · ${info.unpaid||0} unpaid · ${inProgress} workflow</div>
     </div>`;
   }).join('');
 
@@ -491,7 +515,7 @@ function renderHome() {
       <div class="hero-earnings">
         <span class="hero-currency">₱</span><span id="count-num">0</span>
       </div>
-      <div class="hero-sub">${g.paid} video${g.paid!==1?'s':''} paid · ₱${RATE_PER_VIDEO.toLocaleString()} per project</div>
+      <div class="hero-sub">${g.paid} video${g.paid!==1?'s':''} paid total</div>
       <div class="hero-breakdown">
         <div class="hero-stat">
           <div class="hero-stat-val g" id="count-paid">0</div>
@@ -508,14 +532,14 @@ function renderHome() {
           <div class="hero-stat-label">Delivered</div>
         </div>
         <div class="hero-divider"></div>
-        <div class="hero-stat">
+        <div class="hero-stat clickable" onclick="switchTab('summary-checking')">
           <div class="hero-stat-val" style="color:var(--amber)">${g.checking}</div>
-          <div class="hero-stat-label">For Checking</div>
+          <div class="hero-stat-label" style="text-decoration:underline;text-underline-offset:3px">For Checking ↗</div>
         </div>
         <div class="hero-divider"></div>
-        <div class="hero-stat">
-          <div class="hero-stat-val p">${g.editing}</div>
-          <div class="hero-stat-label">Editing</div>
+        <div class="hero-stat clickable" onclick="switchTab('summary-pending')">
+          <div class="hero-stat-val p">${g.pending}</div>
+          <div class="hero-stat-label" style="text-decoration:underline;text-underline-offset:3px">Pending ↗</div>
         </div>
         <div class="hero-divider"></div>
         <div class="hero-stat">
@@ -529,10 +553,10 @@ function renderHome() {
     <div class="status-legend">
       <span class="legend-label">Status key:</span>
       <span class="legend-item"><span class="legend-dot" style="background:#22c55e"></span>Paid — confirmed payment</span>
-      <span class="legend-item"><span class="legend-dot" style="background:#ef4444"></span>Not Paid — done, awaiting payment</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#ef4444"></span>Not Paid — awaiting payment</span>
       <span class="legend-item"><span class="legend-dot" style="background:#60a5fa"></span>Delivered — revised link attached</span>
-      <span class="legend-item"><span class="legend-dot" style="background:#fbbf24"></span>For Checking — exported, no revised link yet</span>
-      <span class="legend-item"><span class="legend-dot" style="background:#a78bfa"></span>Editing — still in production</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#fbbf24"></span>For Checking — exported, pending link feedback</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#a78bfa"></span>Pending — not started yet / no raw frames</span>
     </div>
   `;
 
@@ -543,19 +567,25 @@ function renderHome() {
 
 function renderClient(clientName) {
   document.getElementById('page-home').style.display = 'none';
+  document.getElementById('page-summary').style.display = 'none';
   const el = document.getElementById('page-client');
   el.style.display = '';
+
   const rows = allData[clientName] || [];
   const filtered = filterRows(rows);
   const s = computeStats(rows, clientName);
+  const rate = getRate(clientName);
 
   const tableRows = filtered.map(r => {
     const ps = getProjectStatus(r, clientName);
     const isPaid = ps === 'paid';
     const edCls = r.editor.toLowerCase()==='aus' ? 'editor-aus' : r.editor.toLowerCase()==='neil' ? 'editor-neil' : '';
-    const revisedCell = r.revised && r.revised.trim()
-      ? `<a class="revised-link" href="${r.revised}" target="_blank">↗ View</a>`
-      : `<span class="revised-none">Not revised yet</span>`;
+    
+    const revisedLink = r.revised?.trim() || '';
+    const hasValidLink = revisedLink.startsWith('http://') || revisedLink.startsWith('https://');
+    const revisedCell = hasValidLink
+      ? `<a class="revised-link" href="${revisedLink}" target="_blank" rel="noopener noreferrer">↗ View File</a>`
+      : `<span class="revised-none">No link attached</span>`;
 
     return `<tr>
       <td><span style="color:var(--muted);font-size:12px">${r.date||'–'}</span></td>
@@ -563,14 +593,14 @@ function renderClient(clientName) {
       <td><span class="editor-tag ${edCls}">${r.editor||'–'}</span></td>
       <td>${badgeHTML(ps)}</td>
       <td>${revisedCell}</td>
-      <td><span class="amount ${isPaid?'earned':''}">${isPaid?fmt(RATE_PER_VIDEO):'–'}</span></td>
+      <td><span class="amount ${isPaid?'earned':''}">${isPaid?fmt(rate):'–'}</span></td>
     </tr>`;
   }).join('');
 
   el.innerHTML = `
     <div class="page-header">
       <div>
-        <div class="page-title">Client</div>
+        <div class="page-title">Client Log Overview</div>
         <div class="client-name"><span>${clientName}</span></div>
       </div>
       <div>${editorFilterHTML()}</div>
@@ -580,32 +610,28 @@ function renderClient(clientName) {
       <div class="stat-card earnings">
         <div class="stat-label">Earnings</div>
         <div class="stat-value">₱${s.earnings.toLocaleString()}</div>
-        <div class="stat-sub">${s.paid} paid videos</div>
+        <div class="stat-sub">${s.paid} paid videos (at ₱${rate}/ea)</div>
       </div>
       <div class="stat-card unpaid">
         <div class="stat-label">Pending Payment</div>
-        <div class="stat-value">₱${s.pending.toLocaleString()}</div>
-        <div class="stat-sub">${s.unpaid} not paid yet</div>
+        <div class="stat-value">₱${s.pendingAmount.toLocaleString()}</div>
+        <div class="stat-sub">${s.unpaid} awaiting layout payout</div>
       </div>
       <div class="stat-card total">
         <div class="stat-label">Delivered</div>
         <div class="stat-value" style="color:var(--blue)">${s.done}</div>
-        <div class="stat-sub">Revised link attached</div>
+        <div class="stat-sub">File links attached</div>
       </div>
-      <div class="stat-card editing">
-        <div class="stat-label">In Progress</div>
-        <div class="stat-value">${s.editing + s.checking}</div>
-        <div class="stat-sub">${s.checking} for checking, ${s.editing} editing</div>
+      <div class="stat-card checking-card clickable" onclick="switchTab('summary-checking')">
+        <div class="stat-label">For Checking</div>
+        <div class="stat-value">${s.checking}</div>
+        <div class="stat-sub">View summary overview ↗</div>
       </div>
-    </div>
-
-    <div class="status-legend">
-      <span class="legend-label">Status key:</span>
-      <span class="legend-item"><span class="legend-dot" style="background:#22c55e"></span>Paid</span>
-      <span class="legend-item"><span class="legend-dot" style="background:#ef4444"></span>Not Paid (done, awaiting payment)</span>
-      <span class="legend-item"><span class="legend-dot" style="background:#60a5fa"></span>Delivered (revised link attached)</span>
-      <span class="legend-item"><span class="legend-dot" style="background:#fbbf24"></span>For Checking (exported, no revised link)</span>
-      <span class="legend-item"><span class="legend-dot" style="background:#a78bfa"></span>Editing</span>
+      <div class="stat-card pending-card clickable" onclick="switchTab('summary-pending')">
+        <div class="stat-label">Pending Logs</div>
+        <div class="stat-value">${s.pending}</div>
+        <div class="stat-sub">View breakdown list ↗</div>
+      </div>
     </div>
 
     <div class="table-section">
@@ -619,7 +645,75 @@ function renderClient(clientName) {
             <th>Date</th><th>Project</th><th>Editor</th><th>Status</th><th>Revised File</th><th>Amount</th>
           </tr>
         </thead>
-        <tbody>${tableRows||'<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:32px">No projects found</td></tr>'}</tbody>
+        <tbody>${tableRows||'<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:32px">No projects discovered.</td></tr>'}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+// ── NEW DIRECT FLOW SUMMARY BREAKDOWNS ──────────────────────────────────────
+function renderSummaryPage(type) {
+  document.getElementById('page-home').style.display = 'none';
+  document.getElementById('page-client').style.display = 'none';
+  const el = document.getElementById('page-summary');
+  el.style.display = '';
+
+  const targetStatus = type === 'summary-checking' ? 'checking' : 'pending';
+  const displayTitle = type === 'summary-checking' ? 'For Checking Summary' : 'Pending Workspace List';
+
+  let globalMatches = [];
+  for (const [clientName, rows] of Object.entries(allData)) {
+    const filtered = filterRows(rows);
+    for (const r of filtered) {
+      if (getProjectStatus(r, clientName) === targetStatus) {
+        globalMatches.push({ client: clientName, rowData: r });
+      }
+    }
+  }
+
+  const tableRowsHTML = globalMatches.map(m => {
+    const r = m.rowData;
+    const edCls = r.editor.toLowerCase()==='aus' ? 'editor-aus' : r.editor.toLowerCase()==='neil' ? 'editor-neil' : '';
+    
+    const targetLink = (r.revised?.trim() || r.exported?.trim() || r.frame?.trim() || '');
+    const hasValidLink = targetLink.startsWith('http://') || targetLink.startsWith('https://');
+    const actionCell = hasValidLink 
+      ? `<a class="revised-link" href="${targetLink}" target="_blank" rel="noopener noreferrer">↗ View Resource</a>`
+      : `<span class="revised-none">No Link Found</span>`;
+
+    return `<tr>
+      <td><span style="font-weight:600;color:var(--gold)">${m.client}</span></td>
+      <td><span style="color:var(--muted);font-size:12px">${r.date || '–'}</span></td>
+      <td class="project-name">${r.project || '–'}</td>
+      <td><span class="editor-tag ${edCls}">${r.editor || '–'}</span></td>
+      <td>${badgeHTML(targetStatus)}</td>
+      <td>${actionCell}</td>
+    </tr>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="page-header">
+      <div>
+        <div class="page-title">Global Aggregate Breakdowns</div>
+        <div class="client-name"><span>${displayTitle}</span></div>
+      </div>
+      <div>${editorFilterHTML()}</div>
+    </div>
+
+    <div class="table-section" style="padding-top:40px;">
+      <div class="table-header">
+        <span class="table-title">Active Target Items</span>
+        <span class="table-count">${globalMatches.length} Items Active</span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Client</th><th>Date</th><th>Project Title</th><th>Editor Assigned</th><th>Status Flag</th><th>Asset Link</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${tableRowsHTML || `<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:48px">No elements match status filters perfectly right now.</td></tr>`}
+        </tbody>
       </table>
     </div>
   `;
@@ -638,7 +732,7 @@ function countUp(id, target, duration) {
   requestAnimationFrame(step);
 }
 
-// INIT
+// INITIALIZE SYSTEM
 loadData();
 </script>
 </body>
