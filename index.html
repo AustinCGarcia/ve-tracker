@@ -139,7 +139,8 @@
     background: var(--surface); border: 1px solid var(--border);
     border-radius: 12px; padding: 20px 32px; text-align: center; min-width: 180px;
   }
-  .editor-card-name { font-size: 12px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
+  .editor-card-name { font-size: 12px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 2px; }
+  .editor-card-fullname { font-size: 10px; color: var(--gold); margin-bottom: 8px; opacity: 0.85; }
   .editor-card-amt { font-family: 'Bebas Neue', sans-serif; font-size: 38px; color: var(--text); }
   .editor-card-amt .peso { font-size: 0.5em; color: var(--muted); vertical-align: top; margin-top: 0.2em; }
 
@@ -176,9 +177,19 @@
   .badge-checking { background: rgba(251,191,36,0.12); color: #fbbf24; border: 1px solid rgba(251,191,36,0.2); }
   .badge-pending  { background: rgba(167,139,250,0.12);color: #a78bfa; border: 1px solid rgba(167,139,250,0.2); }
 
-  .editor-tag { display: inline-block; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; }
+  .editor-tag { display: inline-block; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: help; }
   .editor-aus  { background: rgba(217,119,6,0.15);  color: #d97706; }
   .editor-neil { background: rgba(34,197,94,0.15);  color: #22c55e; }
+
+  /* RESOURCE INTERACTIVE LINKS */
+  .resource-link {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; color: var(--blue); text-decoration: none;
+    border: 1px solid rgba(96,165,250,0.25); border-radius: 6px; padding: 2px 8px;
+    transition: all 0.15s;
+  }
+  .resource-link:hover { background: rgba(96,165,250,0.1); border-color: var(--blue); }
+  .resource-none { font-size: 11px; color: var(--muted); font-style: italic; }
 
   .amount { font-family: 'Bebas Neue', sans-serif; font-size: 15px; color: var(--text); letter-spacing: 0.5px; }
   .amount.earned { color: var(--green); }
@@ -235,41 +246,48 @@
 
 <script>
 // ── RATES ──────────────────────────────────────────────────────────────────
-// BullionFX: existing projects stay at ₱400 (tracked per project via sheet data),
-// future rate is ₱500. We apply ₱500 as the default for all clients including BullionFX
-// (historical ₱400 projects must have their rate recorded in the sheet itself).
 const DEFAULT_RATE = 500;
+const BULLION_RATE = 400;
+
+// ── FULL NAME MAPPINGS ─────────────────────────────────────────────────────
+const FULL_NAMES = {
+  'neil': 'Neil Pangilinan',
+  'aus': 'Austin Garcia'
+};
+
+function getFullName(shortName) {
+  const normalized = (shortName || '').toLowerCase().trim();
+  return FULL_NAMES[normalized] || shortName || 'Unknown';
+}
+
+function getRate(clientName) {
+  return clientName === "BullionFX" ? BULLION_RATE : DEFAULT_RATE;
+}
 
 // ── CLIENT DEFINITIONS ────────────────────────────────────────────────────
-// Each client maps CSV columns A-H (index 0-7) to semantic fields.
-// Ignored columns are set to null. Parser reads only what's defined here.
 const CLIENTS = [
   {
     name: "LHF",
     sheet: "1xU1qVfUaCwj5cVlvdY-SKnU4Cw2MqgV2mDA-OlgQgX0",
     gid: "0",
-    // A=date, B=editor, C=project, D=frame, E=export(ignore), F=revised, G=status
     cols: { date:0, editor:1, project:2, frame:3, revised:5, status:6 }
   },
   {
     name: "Boney",
     sheet: "1xU1qVfUaCwj5cVlvdY-SKnU4Cw2MqgV2mDA-OlgQgX0",
     gid: "833188498",
-    // A=date, B=editor, C=project, D=ref(ignore), E=frame, F=export(ignore), G=revised, H=status
     cols: { date:0, editor:1, project:2, frame:4, revised:6, status:7 }
   },
   {
     name: "L&S",
     sheet: "1xU1qVfUaCwj5cVlvdY-SKnU4Cw2MqgV2mDA-OlgQgX0",
     gid: "317078901",
-    // A=date, B=editor, C=project, D=frame, E=export(ignore), F=revised, G=status
     cols: { date:0, editor:1, project:2, frame:3, revised:5, status:6 }
   },
   {
     name: "Jeya",
     sheet: "1xU1qVfUaCwj5cVlvdY-SKnU4Cw2MqgV2mDA-OlgQgX0",
     gid: "1909088031",
-    // A=date, B=editor, C=project, D=ref(ignore), E=frame, F=export(ignore), G=revised, H=status
     cols: { date:0, editor:1, project:2, frame:4, revised:6, status:7 }
   },
   {
@@ -297,26 +315,31 @@ let activeTab = 'home';
 let activeEditor = 'all';
 
 // ── STATUS LOGIC (single source of truth) ─────────────────────────────────
-// Priority order:
-//   1. STATUS column "paid"          → 'paid'
-//   2. STATUS column "unpaid/not paid"→ 'unpaid'
-//   3. REVISED has content            → 'exported'
-//   4. FRAME has content              → 'checking'
-//   5. both empty                     → 'pending'
-//   6. STATUS empty                   → '-' (no workflow status)
-function getProjectStatus(row) {
+function getProjectStatus(row, clientName) {
   const st = (row.status || '').toLowerCase().trim();
 
   if (st.includes('paid') && !st.includes('not')) return 'paid';
   if (st.includes('not paid') || st.includes('unpaid'))  return 'unpaid';
 
-  const hasRevised = row.revised && row.revised.trim();
-  if (hasRevised) return 'exported';
+  // Specific baseline parameters do not apply to BullionFX structural checks
+  if (clientName !== "BullionFX") {
+    const hasFrame = row.frame && row.frame.trim() && (row.frame.startsWith('http://') || row.frame.startsWith('https://'));
+    if (!hasFrame) return 'pending';
 
-  const hasFrame = row.frame && row.frame.trim();
-  if (hasFrame) return 'checking';
+    const hasRevised = row.revised && row.revised.trim() && (row.revised.startsWith('http://') || row.revised.startsWith('https://'));
+    if (hasRevised) return 'exported';
+    
+    return 'checking';
+  } else {
+    // Historical BullionFX structural logic tracking fallback
+    const hasRevised = row.revised && row.revised.trim();
+    if (hasRevised) return 'exported';
 
-  return 'pending';
+    const hasFrame = row.frame && row.frame.trim();
+    if (hasFrame) return 'checking';
+
+    return 'pending';
+  }
 }
 
 // ── CSV HELPERS ───────────────────────────────────────────────────────────
@@ -347,7 +370,6 @@ function parseCSV(text, clientDef) {
     const revised = (c[cols.revised] || '').trim();
     const status  = (c[cols.status]  || '').trim();
 
-    // Skip rows with no project name AND no date (fully empty rows)
     if (!date && !project) continue;
 
     rows.push({ date, editor, project, frame, revised, status });
@@ -386,15 +408,16 @@ function filterByEditor(rows) {
   return rows.filter(r => r.editor.toLowerCase() === activeEditor.toLowerCase());
 }
 
-function computeClientStats(rows) {
+function computeClientStats(rows, clientName) {
   const f = filterByEditor(rows);
   const tally = { paid:0, unpaid:0, exported:0, checking:0, pending:0 };
-  for (const r of f) tally[getProjectStatus(r)]++;
+  const rate = getRate(clientName);
+  for (const r of f) tally[getProjectStatus(r, clientName)]++;
   return {
-    total:    f.length,
+    total: f.length,
     ...tally,
-    earnings:       tally.paid   * DEFAULT_RATE,
-    pendingAmount:  tally.unpaid * DEFAULT_RATE,
+    earnings:       tally.paid   * rate,
+    pendingAmount:  tally.unpaid * rate,
   };
 }
 
@@ -403,25 +426,38 @@ function computeGlobal() {
   const editorMap = {};
   let total = 0;
 
-  for (const [, rows] of Object.entries(allData)) {
+  for (const [clientName, rows] of Object.entries(allData)) {
+    const rate = getRate(clientName);
     for (const r of filterByEditor(rows)) {
       total++;
-      const s = getProjectStatus(r);
+      const s = getProjectStatus(r, clientName);
       tally[s] = (tally[s] || 0) + 1;
 
       const ed = r.editor || 'Unknown';
       if (!editorMap[ed]) editorMap[ed] = { paid:0, unpaid:0, exported:0, checking:0, pending:0, earnings:0 };
       editorMap[ed][s]++;
-      if (s === 'paid') editorMap[ed].earnings += DEFAULT_RATE;
+      if (s === 'paid') editorMap[ed].earnings += rate;
     }
   }
 
   return {
     total, ...tally,
-    earnings:       tally.paid   * DEFAULT_RATE,
-    pendingAmount:  tally.unpaid * DEFAULT_RATE,
     editorMap,
   };
+}
+
+function getGlobalEarningsBreakdown() {
+  let paidSum = 0;
+  let unpaidSum = 0;
+  for (const [clientName, rows] of Object.entries(allData)) {
+    const rate = getRate(clientName);
+    for (const r of filterByEditor(rows)) {
+      const s = getProjectStatus(r, clientName);
+      if (s === 'paid') paidSum += rate;
+      if (s === 'unpaid') unpaidSum += rate;
+    }
+  }
+  return { paidSum, unpaidSum };
 }
 
 // ── RENDER HELPERS ────────────────────────────────────────────────────────
@@ -466,12 +502,14 @@ function editorFilterHTML() {
 function editorTagHTML(editor) {
   const cls = editor.toLowerCase() === 'aus'  ? 'editor-aus'
             : editor.toLowerCase() === 'neil' ? 'editor-neil' : '';
-  return `<span class="editor-tag ${cls}">${editor || '–'}</span>`;
+  const fullName = getFullName(editor);
+  return `<span class="editor-tag ${cls}" title="${fullName}">${editor || '–'}</span>`;
 }
 
-function amountCellHTML(status) {
-  if (status === 'paid')   return `<span class="amount earned">${fmt(DEFAULT_RATE)}</span>`;
-  if (status === 'unpaid') return `<span class="amount owed">${fmt(DEFAULT_RATE)}</span>`;
+function amountCellHTML(status, clientName) {
+  const rate = getRate(clientName);
+  if (status === 'paid')   return `<span class="amount earned">${fmt(rate)}</span>`;
+  if (status === 'unpaid') return `<span class="amount owed">${fmt(rate)}</span>`;
   return `<span style="color:var(--muted)">–</span>`;
 }
 
@@ -512,15 +550,18 @@ function renderHome() {
   el.style.display = '';
 
   const g = computeGlobal();
+  const financial = getGlobalEarningsBreakdown();
   const editors = getEditors();
 
   const editorCards = editors
     .filter(ed => activeEditor === 'all' || activeEditor === ed)
     .map(ed => {
       const info = g.editorMap[ed] || {};
+      const full = getFullName(ed);
       const inProgress = (info.exported||0) + (info.checking||0) + (info.pending||0);
       return `<div class="editor-card">
         <div class="editor-card-name">${ed}</div>
+        <div class="editor-card-fullname">${full}</div>
         <div class="editor-card-amt"><span class="peso">₱</span>${(info.earnings||0).toLocaleString()}</div>
         <div style="font-size:11px;color:var(--muted);margin-top:4px">${info.paid||0} paid · ${info.unpaid||0} unpaid · ${inProgress} in workflow</div>
       </div>`;
@@ -581,13 +622,13 @@ function renderHome() {
       <span class="legend-label">Status key:</span>
       <span class="legend-item"><span class="legend-dot" style="background:#22c55e"></span>Paid</span>
       <span class="legend-item"><span class="legend-dot" style="background:#ef4444"></span>Not Paid</span>
-      <span class="legend-item"><span class="legend-dot" style="background:#2dd4bf"></span>Exported — revised file attached</span>
-      <span class="legend-item"><span class="legend-dot" style="background:#fbbf24"></span>For Checking — frame sent, awaiting revised</span>
-      <span class="legend-item"><span class="legend-dot" style="background:#a78bfa"></span>Pending — no frame or revised yet</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#2dd4bf"></span>Exported — revised file link attached</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#fbbf24"></span>For Checking — frame link active, awaiting revised link</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#a78bfa"></span>Pending — frame link empty / not started</span>
     </div>
   `;
 
-  countUp('count-num',    g.earnings, 1200);
+  countUp('count-num',    financial.paidSum, 1200);
   countUp('count-paid',   g.paid,      900);
   countUp('count-unpaid', g.unpaid,    900);
 }
@@ -600,16 +641,26 @@ function renderClient(clientName) {
 
   const rows = allData[clientName] || [];
   const filtered = filterByEditor(rows);
-  const s = computeClientStats(rows);
+  const s = computeClientStats(rows, clientName);
+  const rate = getRate(clientName);
 
   const tableRows = filtered.map(r => {
-    const ps = getProjectStatus(r);
+    const ps = getProjectStatus(r, clientName);
+    
+    // Evaluate operational targets to extract clickable link resources
+    let targetLink = (r.revised || r.frame || '').trim();
+    let hasValidLink = targetLink.startsWith('http://') || targetLink.startsWith('https://');
+    let linkColumnMarkup = hasValidLink
+      ? `<a class="resource-link" href="${targetLink}" target="_blank" rel="noopener noreferrer">↗ View Resource</a>`
+      : `<span class="resource-none">No link discovered</span>`;
+
     return `<tr>
       <td><span style="color:var(--muted);font-size:12px">${r.date || '–'}</span></td>
       <td class="project-name">${r.project || '–'}</td>
       <td>${editorTagHTML(r.editor)}</td>
       <td>${badgeHTML(ps)}</td>
-      <td>${amountCellHTML(ps)}</td>
+      <td>${linkColumnMarkup}</td>
+      <td>${amountCellHTML(ps, clientName)}</td>
     </tr>`;
   }).join('');
 
@@ -626,7 +677,7 @@ function renderClient(clientName) {
       <div class="stat-card earnings">
         <div class="stat-label">Earnings</div>
         <div class="stat-value">${fmt(s.earnings)}</div>
-        <div class="stat-sub">${s.paid} paid videos · ${fmt(DEFAULT_RATE)}/ea</div>
+        <div class="stat-sub">${s.paid} paid videos · ${fmt(rate)}/ea</div>
       </div>
       <div class="stat-card unpaid clickable" onclick="switchTab('summary-unpaid')">
         <div class="stat-label">Pending Payment</div>
@@ -636,7 +687,7 @@ function renderClient(clientName) {
       <div class="stat-card exported-card">
         <div class="stat-label">Exported</div>
         <div class="stat-value">${s.exported}</div>
-        <div class="stat-sub">Revised file attached</div>
+        <div class="stat-sub">Revised file active</div>
       </div>
       <div class="stat-card checking-card clickable" onclick="switchTab('summary-checking')">
         <div class="stat-label">For Checking</div>
@@ -657,9 +708,9 @@ function renderClient(clientName) {
       </div>
       <table>
         <thead>
-          <tr><th>Date</th><th>Project</th><th>Editor</th><th>Status</th><th>Amount</th></tr>
+          <tr><th>Date</th><th>Project</th><th>Editor</th><th>Status</th><th>Asset Link</th><th>Amount</th></tr>
         </thead>
-        <tbody>${tableRows || '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:32px">No projects found.</td></tr>'}</tbody>
+        <tbody>${tableRows || '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:32px">No projects found.</td></tr>'}</tbody>
       </table>
     </div>
   `;
@@ -679,33 +730,48 @@ function renderSummaryPage(type) {
   };
 
   const matches = [];
+  let aggregateOwedSum = 0;
+
   for (const [clientName, rows] of Object.entries(allData)) {
+    const rate = getRate(clientName);
     for (const r of filterByEditor(rows)) {
-      if (getProjectStatus(r) === type) matches.push({ client: clientName, r });
+      if (getProjectStatus(r, clientName) === type) {
+        matches.push({ client: clientName, r });
+        if (type === 'unpaid') {
+          aggregateOwedSum += rate;
+        }
+      }
     }
   }
 
-  // Extra total for unpaid
-  const unpaidTotal = type === 'unpaid'
+  const unpaidTotalMarkup = type === 'unpaid'
     ? `<div style="margin:0 40px 0;padding:16px 20px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:10px;display:flex;justify-content:space-between;align-items:center">
-        <span style="font-size:13px;color:var(--text2)">${matches.length} unpaid video${matches.length !== 1 ? 's' : ''} · ${fmt(matches.length * DEFAULT_RATE)} total owed</span>
-        <span style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--red)">${fmt(matches.length * DEFAULT_RATE)}</span>
+        <span style="font-size:13px;color:var(--text2)">${matches.length} unpaid video${matches.length !== 1 ? 's' : ''} · Global Accumulation Owed</span>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--red)">${fmt(aggregateOwedSum)}</span>
        </div>`
     : '';
 
   const tableRows = matches.map(({ client, r }) => {
+    const rate = getRate(client);
+    let targetLink = (r.revised || r.frame || '').trim();
+    let hasValidLink = targetLink.startsWith('http://') || targetLink.startsWith('https://');
+    let linkColumnMarkup = hasValidLink
+      ? `<a class="resource-link" href="${targetLink}" target="_blank" rel="noopener noreferrer">↗ View Resource</a>`
+      : `<span class="resource-none">No link attached</span>`;
+
     return `<tr>
       <td><span style="font-weight:600;color:var(--gold)">${client}</span></td>
       <td><span style="color:var(--muted);font-size:12px">${r.date || '–'}</span></td>
       <td class="project-name">${r.project || '–'}</td>
       <td>${editorTagHTML(r.editor)}</td>
       <td>${badgeHTML(type)}</td>
-      ${type === 'unpaid' ? `<td><span class="amount owed">${fmt(DEFAULT_RATE)}</span></td>` : ''}
+      <td>${linkColumnMarkup}</td>
+      ${type === 'unpaid' ? `<td><span class="amount owed">${fmt(rate)}</span></td>` : ''}
     </tr>`;
   }).join('');
 
   const extraCol = type === 'unpaid' ? '<th>Amount</th>' : '';
-  const colSpan  = type === 'unpaid' ? 6 : 5;
+  const colSpan  = type === 'unpaid' ? 7 : 6;
 
   el.innerHTML = `
     <div class="page-header">
@@ -716,7 +782,7 @@ function renderSummaryPage(type) {
       <div>${editorFilterHTML()}</div>
     </div>
 
-    <div style="padding-top:28px">${unpaidTotal}</div>
+    <div style="padding-top:28px">${unpaidTotalMarkup}</div>
 
     <div class="table-section" style="padding-top:20px">
       <div class="table-header">
@@ -725,7 +791,7 @@ function renderSummaryPage(type) {
       </div>
       <table>
         <thead>
-          <tr><th>Client</th><th>Date</th><th>Project</th><th>Editor</th><th>Status</th>${extraCol}</tr>
+          <tr><th>Client</th><th>Date</th><th>Project</th><th>Editor</th><th>Status</th><th>Resource Asset</th>${extraCol}</tr>
         </thead>
         <tbody>
           ${tableRows || `<tr><td colspan="${colSpan}" style="text-align:center;color:var(--muted);padding:48px">No items found for this status.</td></tr>`}
