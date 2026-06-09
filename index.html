@@ -1,13 +1,3 @@
-Here is the updated code for your `index.html` file.
-
-### Key Updates Made:
-
-* **New Status Logic:** Projects without a link in the `frame` column are now marked as **⏳ Pending** (the old "Editing" status has been removed/replaced). Projects with a link in the `revised` column are now marked as **✓ Delivered** (except for *BullionFX*, which relies on its status column text).
-* **BullionFX Custom Pricing:** BullionFX videos now calculate at **₱400** each, while all other clients remain at **₱500**.
-* **Interactive Clickable Summaries:** Clicking on the **Pending** or **For Checking** stat cards (or the stats in the Dashboard hero row) will instantly open a filtered view showing exactly which projects need attention.
-* **Fixed Delivered Link Tracking:** Fixed the parsing check to ensure links from your CSV rows correctly flag the status, and ensured the **↗ View** buttons pull the real, absolute URLs so you can click right through to them.
-
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -29,32 +19,20 @@ Here is the updated code for your `index.html` file.
     --blue: #60a5fa;
     --purple: #a78bfa;
     --amber: #fbbf24;
+    --teal: #2dd4bf;
     --muted: #6b7280;
     --text: #e5e7eb;
     --text2: #9ca3af;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Inter', sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+  body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh; overflow-x: hidden; }
   .app { display: flex; min-height: 100vh; }
 
   /* SIDEBAR */
   .sidebar {
-    width: 220px;
-    background: var(--surface);
-    border-right: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    flex-shrink: 0;
-    position: sticky;
-    top: 0;
-    height: 100vh;
-    overflow-y: auto;
+    width: 220px; background: var(--surface); border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; flex-shrink: 0;
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
   }
   .sidebar-logo { padding: 24px 20px 16px; border-bottom: 1px solid var(--border); }
   .sidebar-logo .suite { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; color: var(--gold); }
@@ -118,20 +96,22 @@ Here is the updated code for your `index.html` file.
     content: ''; position: absolute; top: 0; left: 0; right: 0;
     height: 2px; background: var(--border); border-radius: 12px 12px 0 0;
   }
-  .stat-card.earnings::before { background: linear-gradient(90deg, var(--gold), transparent); }
-  .stat-card.paid::before { background: linear-gradient(90deg, var(--green), transparent); }
-  .stat-card.unpaid::before { background: linear-gradient(90deg, var(--red), transparent); }
-  .stat-card.total::before { background: linear-gradient(90deg, var(--blue), transparent); }
-  .stat-card.pending-card::before { background: linear-gradient(90deg, var(--purple), transparent); }
+  .stat-card.earnings::before   { background: linear-gradient(90deg, var(--gold), transparent); }
+  .stat-card.paid::before       { background: linear-gradient(90deg, var(--green), transparent); }
+  .stat-card.unpaid::before     { background: linear-gradient(90deg, var(--red), transparent); }
+  .stat-card.total::before      { background: linear-gradient(90deg, var(--blue), transparent); }
+  .stat-card.pending-card::before  { background: linear-gradient(90deg, var(--purple), transparent); }
   .stat-card.checking-card::before { background: linear-gradient(90deg, var(--amber), transparent); }
+  .stat-card.exported-card::before { background: linear-gradient(90deg, var(--teal), transparent); }
   .stat-label { font-size: 11px; letter-spacing: 1.5px; color: var(--muted); text-transform: uppercase; margin-bottom: 10px; }
   .stat-value { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 1px; line-height: 1; }
-  .stat-card.earnings .stat-value { color: var(--gold); font-size: 44px; }
-  .stat-card.paid .stat-value { color: var(--green); }
-  .stat-card.unpaid .stat-value { color: var(--red); }
-  .stat-card.total .stat-value { color: var(--blue); }
-  .stat-card.pending-card .stat-value { color: var(--purple); }
+  .stat-card.earnings .stat-value  { color: var(--gold); font-size: 44px; }
+  .stat-card.paid .stat-value      { color: var(--green); }
+  .stat-card.unpaid .stat-value    { color: var(--red); }
+  .stat-card.total .stat-value     { color: var(--blue); }
+  .stat-card.pending-card .stat-value  { color: var(--purple); }
   .stat-card.checking-card .stat-value { color: var(--amber); }
+  .stat-card.exported-card .stat-value { color: var(--teal); }
   .stat-sub { font-size: 11px; color: var(--muted); margin-top: 6px; }
 
   /* HERO */
@@ -141,7 +121,6 @@ Here is the updated code for your `index.html` file.
     font-family: 'Bebas Neue', sans-serif;
     font-size: clamp(80px, 15vw, 160px);
     letter-spacing: 4px; color: var(--gold); line-height: 1;
-    transition: color 0.3s;
   }
   .hero-currency { font-size: 0.4em; vertical-align: top; margin-top: 0.18em; color: var(--gold-dim); }
   .hero-sub { font-size: 14px; color: var(--muted); margin-top: 12px; letter-spacing: 1px; }
@@ -165,10 +144,7 @@ Here is the updated code for your `index.html` file.
   .editor-card-amt .peso { font-size: 0.5em; color: var(--muted); vertical-align: top; margin-top: 0.2em; }
 
   /* STATUS LEGEND */
-  .status-legend {
-    display: flex; gap: 16px; flex-wrap: wrap;
-    padding: 20px 40px 0; align-items: center;
-  }
+  .status-legend { display: flex; gap: 16px; flex-wrap: wrap; padding: 20px 40px 0; align-items: center; }
   .legend-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
   .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text2); }
   .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
@@ -196,7 +172,7 @@ Here is the updated code for your `index.html` file.
   }
   .badge-paid     { background: rgba(34,197,94,0.12);  color: #22c55e; border: 1px solid rgba(34,197,94,0.2); }
   .badge-unpaid   { background: rgba(239,68,68,0.12);  color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
-  .badge-done     { background: rgba(96,165,250,0.12); color: #60a5fa; border: 1px solid rgba(96,165,250,0.2); }
+  .badge-exported { background: rgba(45,212,191,0.12); color: #2dd4bf; border: 1px solid rgba(45,212,191,0.2); }
   .badge-checking { background: rgba(251,191,36,0.12); color: #fbbf24; border: 1px solid rgba(251,191,36,0.2); }
   .badge-pending  { background: rgba(167,139,250,0.12);color: #a78bfa; border: 1px solid rgba(167,139,250,0.2); }
 
@@ -204,17 +180,9 @@ Here is the updated code for your `index.html` file.
   .editor-aus  { background: rgba(217,119,6,0.15);  color: #d97706; }
   .editor-neil { background: rgba(34,197,94,0.15);  color: #22c55e; }
 
-  /* REVISED LINK */
-  .revised-link {
-    display: inline-flex; align-items: center; gap: 4px;
-    font-size: 11px; color: var(--blue); text-decoration: none;
-    border: 1px solid rgba(96,165,250,0.25); border-radius: 6px; padding: 2px 8px;
-  }
-  .revised-link:hover { background: rgba(96,165,250,0.1); }
-  .revised-none { font-size: 11px; color: var(--muted); font-style: italic; }
-
   .amount { font-family: 'Bebas Neue', sans-serif; font-size: 15px; color: var(--text); letter-spacing: 0.5px; }
   .amount.earned { color: var(--green); }
+  .amount.owed   { color: var(--red); }
 
   /* LOADING / ERROR */
   .state-msg { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 300px; gap: 16px; color: var(--muted); }
@@ -266,93 +234,92 @@ Here is the updated code for your `index.html` file.
 </div>
 
 <script>
-const STANDARD_RATE = 500;
-const BULLION_RATE = 400;
+// ── RATES ──────────────────────────────────────────────────────────────────
+// BullionFX: existing projects stay at ₱400 (tracked per project via sheet data),
+// future rate is ₱500. We apply ₱500 as the default for all clients including BullionFX
+// (historical ₱400 projects must have their rate recorded in the sheet itself).
+const DEFAULT_RATE = 500;
+
+// ── CLIENT DEFINITIONS ────────────────────────────────────────────────────
+// Each client maps CSV columns A-H (index 0-7) to semantic fields.
+// Ignored columns are set to null. Parser reads only what's defined here.
+const CLIENTS = [
+  {
+    name: "LHF",
+    sheet: "1xU1qVfUaCwj5cVlvdY-SKnU4Cw2MqgV2mDA-OlgQgX0",
+    gid: "0",
+    // A=date, B=editor, C=project, D=frame, E=export(ignore), F=revised, G=status
+    cols: { date:0, editor:1, project:2, frame:3, revised:5, status:6 }
+  },
+  {
+    name: "Boney",
+    sheet: "1xU1qVfUaCwj5cVlvdY-SKnU4Cw2MqgV2mDA-OlgQgX0",
+    gid: "833188498",
+    // A=date, B=editor, C=project, D=ref(ignore), E=frame, F=export(ignore), G=revised, H=status
+    cols: { date:0, editor:1, project:2, frame:4, revised:6, status:7 }
+  },
+  {
+    name: "L&S",
+    sheet: "1xU1qVfUaCwj5cVlvdY-SKnU4Cw2MqgV2mDA-OlgQgX0",
+    gid: "317078901",
+    // A=date, B=editor, C=project, D=frame, E=export(ignore), F=revised, G=status
+    cols: { date:0, editor:1, project:2, frame:3, revised:5, status:6 }
+  },
+  {
+    name: "Jeya",
+    sheet: "1xU1qVfUaCwj5cVlvdY-SKnU4Cw2MqgV2mDA-OlgQgX0",
+    gid: "1909088031",
+    // A=date, B=editor, C=project, D=ref(ignore), E=frame, F=export(ignore), G=revised, H=status
+    cols: { date:0, editor:1, project:2, frame:4, revised:6, status:7 }
+  },
+  {
+    name: "AM Market",
+    sheet: "1xU1qVfUaCwj5cVlvdY-SKnU4Cw2MqgV2mDA-OlgQgX0",
+    gid: "1001571984",
+    cols: { date:0, editor:1, project:2, frame:4, revised:6, status:7 }
+  },
+  {
+    name: "BullionFX",
+    sheet: "1xU1qVfUaCwj5cVlvdY-SKnU4Cw2MqgV2mDA-OlgQgX0",
+    gid: "1467316596",
+    cols: { date:0, editor:1, project:2, frame:4, revised:6, status:7 }
+  },
+  {
+    name: "Goreng Story",
+    sheet: "1xU1qVfUaCwj5cVlvdY-SKnU4Cw2MqgV2mDA-OlgQgX0",
+    gid: "210567726",
+    cols: { date:0, editor:1, project:2, frame:4, revised:6, status:7 }
+  }
+];
 
 let allData = {};
 let activeTab = 'home';
 let activeEditor = 'all';
 
-const CLIENTS = [
-  { name: "LHF",           sheet: "1xU1qVfUaCwj5cVlvdY-SKnU4Cw2MqgV2mDA-OlgQgX0", gid: "0" },
-  { name: "Boney",         sheet: "1xU1qVfUaCwj5cVlvdY-SKnU4Cw2MqgV2mDA-OlgQgX0", gid: "833188498" },
-  { name: "L&S",           sheet: "1xU1qVfUaCwj5cVlvdY-SKnU4Cw2MqgV2mDA-OlgQgX0", gid: "317078901" },
-  { name: "Jeya",          sheet: "1xU1qVfUaCwj5cVlvdY-SKnU4Cw2MqgV2mDA-OlgQgX0", gid: "1909088031" },
-  { name: "AM Market",     sheet: "1xU1qVfUaCwj5cVlvdY-SKnU4Cw2MqgV2mDA-OlgQgX0", gid: "1001571984" },
-  { name: "BullionFX",     sheet: "1xU1qVfUaCwj5cVlvdY-SKnU4Cw2MqgV2mDA-OlgQgX0", gid: "1467316596" },
-  { name: "Goreng Story",  sheet: "1xU1qVfUaCwj5cVlvdY-SKnU4Cw2MqgV2mDA-OlgQgX0", gid: "210567726" }
-];
+// ── STATUS LOGIC (single source of truth) ─────────────────────────────────
+// Priority order:
+//   1. STATUS column "paid"          → 'paid'
+//   2. STATUS column "unpaid/not paid"→ 'unpaid'
+//   3. REVISED has content            → 'exported'
+//   4. FRAME has content              → 'checking'
+//   5. both empty                     → 'pending'
+//   6. STATUS empty                   → '-' (no workflow status)
+function getProjectStatus(row) {
+  const st = (row.status || '').toLowerCase().trim();
 
-function getRate(clientName) {
-  return clientName === "BullionFX" ? BULLION_RATE : STANDARD_RATE;
+  if (st.includes('paid') && !st.includes('not')) return 'paid';
+  if (st.includes('not paid') || st.includes('unpaid'))  return 'unpaid';
+
+  const hasRevised = row.revised && row.revised.trim();
+  if (hasRevised) return 'exported';
+
+  const hasFrame = row.frame && row.frame.trim();
+  if (hasFrame) return 'checking';
+
+  return 'pending';
 }
 
-// ── STATUS LOGIC ───────────────────────────────────────────────────────────
-function getProjectStatus(row, clientName) {
-  const st = (row.status || '').toUpperCase();
-  
-  // Custom tracking logic exceptions for BullionFX
-  if (clientName === "BullionFX") {
-    if (st.includes('PAID') && !st.includes('NOT')) return 'paid';
-    if (st.includes('NOT PAID')) return 'unpaid';
-    if (row.exported && row.exported.trim()) return 'checking';
-    return 'pending';
-  }
-
-  // Universal Logic for other clients
-  if (st.includes('PAID') && !st.includes('NOT')) return 'paid';
-  if (st.includes('NOT PAID')) return 'unpaid';
-  if (row.revised && row.revised.trim() && (row.revised.startsWith('http://') || row.revised.startsWith('https://'))) return 'done';
-  if (row.exported && row.exported.trim()) return 'checking';
-  if (!row.frame || !row.frame.trim()) return 'pending';
-  
-  return 'pending'; 
-}
-
-async function fetchSheet(sheetId, gid) {
-  const url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=${gid}`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error('Could not fetch sheet.');
-  const text = await res.text();
-  return text;
-}
-
-// ── CUSTOM LAYOUT PARSING ──────────────────────────────────────────────────
-function parseCSVForClient(text, clientName) {
-  const lines = text.split('\n').filter(l => l.trim());
-  if (lines.length < 2) return [];
-  const rows = [];
-  const normName = clientName.toUpperCase();
-  
-  for (let i = 1; i < lines.length; i++) {
-    const c = splitCSVLine(lines[i]);
-    if (!c[0]?.trim() && !c[2]?.trim()) continue;
-    
-    let parsedRow = { date: '', editor: '', project: '', reference: '', frame: '', exported: '', revised: '', status: '' };
-    
-    if (normName === "LHF" || normName === "L&S") {
-      parsedRow.date     = c[0]?.trim() || '';
-      parsedRow.editor   = c[1]?.trim() || '';
-      parsedRow.project  = c[2]?.trim() || '';
-      parsedRow.frame    = c[3]?.trim() || '';
-      parsedRow.exported = c[4]?.trim() || '';
-      parsedRow.revised  = c[5]?.trim() || '';
-      parsedRow.status   = (c[6]?.trim() || '').toUpperCase();
-    } else {
-      parsedRow.date     = c[0]?.trim() || '';
-      parsedRow.editor   = c[1]?.trim() || '';
-      parsedRow.project  = c[2]?.trim() || '';
-      parsedRow.reference= c[3]?.trim() || '';
-      parsedRow.frame    = c[4]?.trim() || '';
-      parsedRow.exported = c[5]?.trim() || '';
-      parsedRow.revised  = c[6]?.trim() || '';
-      parsedRow.status   = (c[7]?.trim() || '').toUpperCase();
-    }
-    rows.push(parsedRow);
-  }
-  return rows;
-}
-
+// ── CSV HELPERS ───────────────────────────────────────────────────────────
 function splitCSVLine(line) {
   const result = []; let cur = '', inQ = false;
   for (let i = 0; i < line.length; i++) {
@@ -365,74 +332,104 @@ function splitCSVLine(line) {
   return result;
 }
 
+function parseCSV(text, clientDef) {
+  const lines = text.split('\n').filter(l => l.trim());
+  if (lines.length < 2) return [];
+  const { cols } = clientDef;
+  const rows = [];
+
+  for (let i = 1; i < lines.length; i++) {
+    const c = splitCSVLine(lines[i]);
+    const date    = (c[cols.date]    || '').trim();
+    const editor  = (c[cols.editor]  || '').trim();
+    const project = (c[cols.project] || '').trim();
+    const frame   = (c[cols.frame]   || '').trim();
+    const revised = (c[cols.revised] || '').trim();
+    const status  = (c[cols.status]  || '').trim();
+
+    // Skip rows with no project name AND no date (fully empty rows)
+    if (!date && !project) continue;
+
+    rows.push({ date, editor, project, frame, revised, status });
+  }
+  return rows;
+}
+
+async function fetchSheet(sheetId, gid) {
+  const url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=${gid}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Could not fetch sheet gid=${gid}`);
+  return res.text();
+}
+
 async function loadData() {
+  document.getElementById('last-updated').textContent = 'Refreshing…';
   try {
     allData = {};
     for (const client of CLIENTS) {
-      const rawText = await fetchSheet(client.sheet, client.gid);
-      const rows = parseCSVForClient(rawText, client.name);
-      if (rows.length) {
-        allData[client.name] = rows;
-      }
+      const text = await fetchSheet(client.sheet, client.gid);
+      const rows = parseCSV(text, client);
+      if (rows.length) allData[client.name] = rows;
     }
     renderAll();
     document.getElementById('last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString();
-  } catch(e) {
-    console.warn('Refresh error:', e);
+  } catch (e) {
+    console.error('loadData error:', e);
+    document.getElementById('last-updated').textContent = 'Refresh failed';
   }
 }
 
-function filterRows(rows) {
+// ── FILTERING & AGGREGATION ───────────────────────────────────────────────
+function filterByEditor(rows) {
   if (!rows) return [];
   if (activeEditor === 'all') return rows;
   return rows.filter(r => r.editor.toLowerCase() === activeEditor.toLowerCase());
 }
 
-function computeStats(rows, clientName) {
-  const f = filterRows(rows);
-  const rate = getRate(clientName);
-  let paid=0, unpaid=0, done=0, checking=0, pending=0;
-  for (const r of f) {
-    const s = getProjectStatus(r, clientName);
-    if (s==='paid')     paid++;
-    if (s==='unpaid')   unpaid++;
-    if (s==='done')     done++;
-    if (s==='checking') checking++;
-    if (s==='pending')  pending++;
-  }
-  return { total:f.length, paid, unpaid, done, checking, pending,
-    earnings: paid*rate, pendingAmount: unpaid*rate };
+function computeClientStats(rows) {
+  const f = filterByEditor(rows);
+  const tally = { paid:0, unpaid:0, exported:0, checking:0, pending:0 };
+  for (const r of f) tally[getProjectStatus(r)]++;
+  return {
+    total:    f.length,
+    ...tally,
+    earnings:       tally.paid   * DEFAULT_RATE,
+    pendingAmount:  tally.unpaid * DEFAULT_RATE,
+  };
 }
 
 function computeGlobal() {
-  let total=0, paid=0, unpaid=0, done=0, checking=0, pending=0, earnings=0, pendingAmount=0;
+  const tally = { paid:0, unpaid:0, exported:0, checking:0, pending:0 };
   const editorMap = {};
-  for (const [clientName, rows] of Object.entries(allData)) {
-    const f = filterRows(rows);
-    const rate = getRate(clientName);
-    for (const r of f) {
+  let total = 0;
+
+  for (const [, rows] of Object.entries(allData)) {
+    for (const r of filterByEditor(rows)) {
       total++;
-      const s = getProjectStatus(r, clientName);
-      if (s==='paid') { paid++; earnings += rate; }
-      if (s==='unpaid') { unpaid++; pendingAmount += rate; }
-      if (s==='done')     done++;
-      if (s==='checking') checking++;
-      if (s==='pending')  pending++;
-      
+      const s = getProjectStatus(r);
+      tally[s] = (tally[s] || 0) + 1;
+
       const ed = r.editor || 'Unknown';
-      if (!editorMap[ed]) editorMap[ed] = { paid:0, unpaid:0, done:0, checking:0, pending:0, earnings:0 };
+      if (!editorMap[ed]) editorMap[ed] = { paid:0, unpaid:0, exported:0, checking:0, pending:0, earnings:0 };
       editorMap[ed][s]++;
-      if (s==='paid') editorMap[ed].earnings += rate;
+      if (s === 'paid') editorMap[ed].earnings += DEFAULT_RATE;
     }
   }
-  return { total, paid, unpaid, done, checking, pending, earnings, pendingAmount, editorMap };
+
+  return {
+    total, ...tally,
+    earnings:       tally.paid   * DEFAULT_RATE,
+    pendingAmount:  tally.unpaid * DEFAULT_RATE,
+    editorMap,
+  };
 }
 
+// ── RENDER HELPERS ────────────────────────────────────────────────────────
 function badgeHTML(status) {
   const map = {
     paid:     ['badge-paid',     '✓ Paid'],
     unpaid:   ['badge-unpaid',   '✕ Not Paid'],
-    done:     ['badge-done',     '✓ Delivered'],
+    exported: ['badge-exported', '✓ Exported'],
     checking: ['badge-checking', '⏳ For Checking'],
     pending:  ['badge-pending',  '⏳ Pending'],
   };
@@ -444,17 +441,21 @@ function fmt(n) { return '₱' + n.toLocaleString(); }
 
 function getEditors() {
   const s = new Set();
-  for (const rows of Object.values(allData)) rows.forEach(r => r.editor && s.add(r.editor));
+  for (const rows of Object.values(allData)) {
+    rows.forEach(r => {
+      if (r.editor && r.editor.trim() && r.editor.toLowerCase() !== 'val') s.add(r.editor);
+    });
+  }
   return [...s].sort();
 }
 
 function editorFilterHTML() {
   const editors = getEditors();
+  const allActive = activeEditor === 'all' ? 'active' : '';
   const btns = editors.map(e => {
     const active = activeEditor === e ? 'active' : '';
     return `<button class="editor-btn ${active}" onclick="setEditor('${e}')">${e}</button>`;
   }).join('');
-  const allActive = activeEditor === 'all' ? 'active' : '';
   return `<div class="editor-filter">
     <span class="filter-label">Editor:</span>
     <button class="editor-btn ${allActive}" onclick="setEditor('all')">All</button>
@@ -462,34 +463,47 @@ function editorFilterHTML() {
   </div>`;
 }
 
+function editorTagHTML(editor) {
+  const cls = editor.toLowerCase() === 'aus'  ? 'editor-aus'
+            : editor.toLowerCase() === 'neil' ? 'editor-neil' : '';
+  return `<span class="editor-tag ${cls}">${editor || '–'}</span>`;
+}
+
+function amountCellHTML(status) {
+  if (status === 'paid')   return `<span class="amount earned">${fmt(DEFAULT_RATE)}</span>`;
+  if (status === 'unpaid') return `<span class="amount owed">${fmt(DEFAULT_RATE)}</span>`;
+  return `<span style="color:var(--muted)">–</span>`;
+}
+
+// ── RENDER PIPELINE ────────────────────────────────────────────────────────
 function setEditor(name) { activeEditor = name; renderAll(); }
+function switchTab(tab) { activeTab = tab; renderAll(); window.scrollTo(0,0); }
 
 function renderAll() {
   renderSidebar();
-  if (activeTab === 'home') renderHome();
-  else if (activeTab === 'summary-pending' || activeTab === 'summary-checking') renderSummaryPage(activeTab);
-  else renderClient(activeTab);
+  if      (activeTab === 'home')            renderHome();
+  else if (activeTab === 'summary-pending') renderSummaryPage('pending');
+  else if (activeTab === 'summary-checking')renderSummaryPage('checking');
+  else if (activeTab === 'summary-unpaid')  renderSummaryPage('unpaid');
+  else                                      renderClient(activeTab);
 }
 
 function renderSidebar() {
   const nav = document.getElementById('client-nav');
-  const clients = Object.keys(allData);
-  const colors = ['#60a5fa','#f472b6','#34d399','#a78bfa','#fb923c','#e879f9'];
-  
-  document.getElementById('nav-home').className = (activeTab === 'home') ? 'nav-item active' : 'nav-item';
-  
-  nav.innerHTML = clients.map((c, i) => {
-    const rows = filterRows(allData[c]);
+  const colors = ['#60a5fa','#f472b6','#34d399','#a78bfa','#fb923c','#e879f9','#f9a8d4'];
+
+  document.getElementById('nav-home').className = activeTab === 'home' ? 'nav-item active' : 'nav-item';
+
+  nav.innerHTML = Object.keys(allData).map((c, i) => {
+    const count = filterByEditor(allData[c]).length;
     const active = activeTab === c ? 'active' : '';
     return `<div class="nav-item ${active}" onclick="switchTab('${c}')">
-      <div class="dot" style="background:${colors[i%colors.length]}"></div>
+      <div class="dot" style="background:${colors[i % colors.length]}"></div>
       <span>${c}</span>
-      <span class="nav-count">${rows.length}</span>
+      <span class="nav-count">${count}</span>
     </div>`;
   }).join('');
 }
-
-function switchTab(tab) { activeTab = tab; renderAll(); window.scrollTo(0,0); }
 
 function renderHome() {
   document.getElementById('page-client').style.display = 'none';
@@ -500,16 +514,17 @@ function renderHome() {
   const g = computeGlobal();
   const editors = getEditors();
 
-  const editorCards = editors.map(ed => {
-    if (activeEditor !== 'all' && activeEditor !== ed) return '';
-    const info = g.editorMap[ed] || {};
-    const inProgress = (info.pending||0) + (info.checking||0) + (info.done||0);
-    return `<div class="editor-card">
-      <div class="editor-card-name">${ed}</div>
-      <div class="editor-card-amt"><span class="peso">₱</span>${(info.earnings || 0).toLocaleString()}</div>
-      <div style="font-size:11px;color:var(--muted);margin-top:4px">${info.paid||0} paid · ${info.unpaid||0} unpaid · ${inProgress} workflow</div>
-    </div>`;
-  }).join('');
+  const editorCards = editors
+    .filter(ed => activeEditor === 'all' || activeEditor === ed)
+    .map(ed => {
+      const info = g.editorMap[ed] || {};
+      const inProgress = (info.exported||0) + (info.checking||0) + (info.pending||0);
+      return `<div class="editor-card">
+        <div class="editor-card-name">${ed}</div>
+        <div class="editor-card-amt"><span class="peso">₱</span>${(info.earnings||0).toLocaleString()}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px">${info.paid||0} paid · ${info.unpaid||0} unpaid · ${inProgress} in workflow</div>
+      </div>`;
+    }).join('');
 
   el.innerHTML = `
     <div class="page-header">
@@ -525,21 +540,22 @@ function renderHome() {
       <div class="hero-earnings">
         <span class="hero-currency">₱</span><span id="count-num">0</span>
       </div>
-      <div class="hero-sub">${g.paid} video${g.paid!==1?'s':''} paid total</div>
+      <div class="hero-sub">${g.paid} video${g.paid !== 1 ? 's' : ''} paid total</div>
+
       <div class="hero-breakdown">
         <div class="hero-stat">
           <div class="hero-stat-val g" id="count-paid">0</div>
           <div class="hero-stat-label">Paid</div>
         </div>
         <div class="hero-divider"></div>
-        <div class="hero-stat">
+        <div class="hero-stat clickable" onclick="switchTab('summary-unpaid')">
           <div class="hero-stat-val r" id="count-unpaid">0</div>
-          <div class="hero-stat-label">Not Paid</div>
+          <div class="hero-stat-label" style="text-decoration:underline;text-underline-offset:3px">Not Paid ↗</div>
         </div>
         <div class="hero-divider"></div>
         <div class="hero-stat">
-          <div class="hero-stat-val" style="color:var(--blue)">${g.done}</div>
-          <div class="hero-stat-label">Delivered</div>
+          <div class="hero-stat-val" style="color:var(--teal)">${g.exported}</div>
+          <div class="hero-stat-label">Exported</div>
         </div>
         <div class="hero-divider"></div>
         <div class="hero-stat clickable" onclick="switchTab('summary-checking')">
@@ -557,22 +573,23 @@ function renderHome() {
           <div class="hero-stat-label">Total</div>
         </div>
       </div>
+
       ${editorCards ? `<div class="editor-earnings" style="margin-top:36px">${editorCards}</div>` : ''}
     </div>
 
     <div class="status-legend">
       <span class="legend-label">Status key:</span>
-      <span class="legend-item"><span class="legend-dot" style="background:#22c55e"></span>Paid — confirmed payment</span>
-      <span class="legend-item"><span class="legend-dot" style="background:#ef4444"></span>Not Paid — awaiting payment</span>
-      <span class="legend-item"><span class="legend-dot" style="background:#60a5fa"></span>Delivered — revised link attached</span>
-      <span class="legend-item"><span class="legend-dot" style="background:#fbbf24"></span>For Checking — exported, pending link feedback</span>
-      <span class="legend-item"><span class="legend-dot" style="background:#a78bfa"></span>Pending — not started yet / no raw frames</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#22c55e"></span>Paid</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#ef4444"></span>Not Paid</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#2dd4bf"></span>Exported — revised file attached</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#fbbf24"></span>For Checking — frame sent, awaiting revised</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#a78bfa"></span>Pending — no frame or revised yet</span>
     </div>
   `;
 
-  countUp('count-num', g.earnings, 1200);
-  countUp('count-paid', g.paid, 900);
-  countUp('count-unpaid', g.unpaid, 900);
+  countUp('count-num',    g.earnings, 1200);
+  countUp('count-paid',   g.paid,      900);
+  countUp('count-unpaid', g.unpaid,    900);
 }
 
 function renderClient(clientName) {
@@ -582,28 +599,17 @@ function renderClient(clientName) {
   el.style.display = '';
 
   const rows = allData[clientName] || [];
-  const filtered = filterRows(rows);
-  const s = computeStats(rows, clientName);
-  const rate = getRate(clientName);
+  const filtered = filterByEditor(rows);
+  const s = computeClientStats(rows);
 
   const tableRows = filtered.map(r => {
-    const ps = getProjectStatus(r, clientName);
-    const isPaid = ps === 'paid';
-    const edCls = r.editor.toLowerCase()==='aus' ? 'editor-aus' : r.editor.toLowerCase()==='neil' ? 'editor-neil' : '';
-    
-    const revisedLink = r.revised?.trim() || '';
-    const hasValidLink = revisedLink.startsWith('http://') || revisedLink.startsWith('https://');
-    const revisedCell = hasValidLink
-      ? `<a class="revised-link" href="${revisedLink}" target="_blank" rel="noopener noreferrer">↗ View File</a>`
-      : `<span class="revised-none">No link attached</span>`;
-
+    const ps = getProjectStatus(r);
     return `<tr>
-      <td><span style="color:var(--muted);font-size:12px">${r.date||'–'}</span></td>
-      <td class="project-name">${r.project||'–'}</td>
-      <td><span class="editor-tag ${edCls}">${r.editor||'–'}</span></td>
+      <td><span style="color:var(--muted);font-size:12px">${r.date || '–'}</span></td>
+      <td class="project-name">${r.project || '–'}</td>
+      <td>${editorTagHTML(r.editor)}</td>
       <td>${badgeHTML(ps)}</td>
-      <td>${revisedCell}</td>
-      <td><span class="amount ${isPaid?'earned':''}">${isPaid?fmt(rate):'–'}</span></td>
+      <td>${amountCellHTML(ps)}</td>
     </tr>`;
   }).join('');
 
@@ -619,28 +625,28 @@ function renderClient(clientName) {
     <div class="stats-row">
       <div class="stat-card earnings">
         <div class="stat-label">Earnings</div>
-        <div class="stat-value">₱${s.earnings.toLocaleString()}</div>
-        <div class="stat-sub">${s.paid} paid videos (at ₱${rate}/ea)</div>
+        <div class="stat-value">${fmt(s.earnings)}</div>
+        <div class="stat-sub">${s.paid} paid videos · ${fmt(DEFAULT_RATE)}/ea</div>
       </div>
-      <div class="stat-card unpaid">
+      <div class="stat-card unpaid clickable" onclick="switchTab('summary-unpaid')">
         <div class="stat-label">Pending Payment</div>
-        <div class="stat-value">₱${s.pendingAmount.toLocaleString()}</div>
-        <div class="stat-sub">${s.unpaid} awaiting layout payout</div>
+        <div class="stat-value">${fmt(s.pendingAmount)}</div>
+        <div class="stat-sub">${s.unpaid} awaiting payout ↗</div>
       </div>
-      <div class="stat-card total">
-        <div class="stat-label">Delivered</div>
-        <div class="stat-value" style="color:var(--blue)">${s.done}</div>
-        <div class="stat-sub">File links attached</div>
+      <div class="stat-card exported-card">
+        <div class="stat-label">Exported</div>
+        <div class="stat-value">${s.exported}</div>
+        <div class="stat-sub">Revised file attached</div>
       </div>
       <div class="stat-card checking-card clickable" onclick="switchTab('summary-checking')">
         <div class="stat-label">For Checking</div>
         <div class="stat-value">${s.checking}</div>
-        <div class="stat-sub">View summary overview ↗</div>
+        <div class="stat-sub">View summary ↗</div>
       </div>
       <div class="stat-card pending-card clickable" onclick="switchTab('summary-pending')">
-        <div class="stat-label">Pending Logs</div>
+        <div class="stat-label">Pending</div>
         <div class="stat-value">${s.pending}</div>
-        <div class="stat-sub">View breakdown list ↗</div>
+        <div class="stat-sub">View breakdown ↗</div>
       </div>
     </div>
 
@@ -651,84 +657,85 @@ function renderClient(clientName) {
       </div>
       <table>
         <thead>
-          <tr>
-            <th>Date</th><th>Project</th><th>Editor</th><th>Status</th><th>Revised File</th><th>Amount</th>
-          </tr>
+          <tr><th>Date</th><th>Project</th><th>Editor</th><th>Status</th><th>Amount</th></tr>
         </thead>
-        <tbody>${tableRows||'<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:32px">No projects discovered.</td></tr>'}</tbody>
+        <tbody>${tableRows || '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:32px">No projects found.</td></tr>'}</tbody>
       </table>
     </div>
   `;
 }
 
-// ── NEW DIRECT FLOW SUMMARY BREAKDOWNS ──────────────────────────────────────
+// ── SUMMARY PAGES (Pending / Checking / Unpaid) ───────────────────────────
 function renderSummaryPage(type) {
   document.getElementById('page-home').style.display = 'none';
   document.getElementById('page-client').style.display = 'none';
   const el = document.getElementById('page-summary');
   el.style.display = '';
 
-  const targetStatus = type === 'summary-checking' ? 'checking' : 'pending';
-  const displayTitle = type === 'summary-checking' ? 'For Checking Summary' : 'Pending Workspace List';
+  const titleMap = {
+    pending:  'Pending Workspace',
+    checking: 'For Checking Summary',
+    unpaid:   'Unpaid Summary',
+  };
 
-  let globalMatches = [];
+  const matches = [];
   for (const [clientName, rows] of Object.entries(allData)) {
-    const filtered = filterRows(rows);
-    for (const r of filtered) {
-      if (getProjectStatus(r, clientName) === targetStatus) {
-        globalMatches.push({ client: clientName, rowData: r });
-      }
+    for (const r of filterByEditor(rows)) {
+      if (getProjectStatus(r) === type) matches.push({ client: clientName, r });
     }
   }
 
-  const tableRowsHTML = globalMatches.map(m => {
-    const r = m.rowData;
-    const edCls = r.editor.toLowerCase()==='aus' ? 'editor-aus' : r.editor.toLowerCase()==='neil' ? 'editor-neil' : '';
-    
-    const targetLink = (r.revised?.trim() || r.exported?.trim() || r.frame?.trim() || '');
-    const hasValidLink = targetLink.startsWith('http://') || targetLink.startsWith('https://');
-    const actionCell = hasValidLink 
-      ? `<a class="revised-link" href="${targetLink}" target="_blank" rel="noopener noreferrer">↗ View Resource</a>`
-      : `<span class="revised-none">No Link Found</span>`;
+  // Extra total for unpaid
+  const unpaidTotal = type === 'unpaid'
+    ? `<div style="margin:0 40px 0;padding:16px 20px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:10px;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:13px;color:var(--text2)">${matches.length} unpaid video${matches.length !== 1 ? 's' : ''} · ${fmt(matches.length * DEFAULT_RATE)} total owed</span>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--red)">${fmt(matches.length * DEFAULT_RATE)}</span>
+       </div>`
+    : '';
 
+  const tableRows = matches.map(({ client, r }) => {
     return `<tr>
-      <td><span style="font-weight:600;color:var(--gold)">${m.client}</span></td>
+      <td><span style="font-weight:600;color:var(--gold)">${client}</span></td>
       <td><span style="color:var(--muted);font-size:12px">${r.date || '–'}</span></td>
       <td class="project-name">${r.project || '–'}</td>
-      <td><span class="editor-tag ${edCls}">${r.editor || '–'}</span></td>
-      <td>${badgeHTML(targetStatus)}</td>
-      <td>${actionCell}</td>
+      <td>${editorTagHTML(r.editor)}</td>
+      <td>${badgeHTML(type)}</td>
+      ${type === 'unpaid' ? `<td><span class="amount owed">${fmt(DEFAULT_RATE)}</span></td>` : ''}
     </tr>`;
   }).join('');
+
+  const extraCol = type === 'unpaid' ? '<th>Amount</th>' : '';
+  const colSpan  = type === 'unpaid' ? 6 : 5;
 
   el.innerHTML = `
     <div class="page-header">
       <div>
-        <div class="page-title">Global Aggregate Breakdowns</div>
-        <div class="client-name"><span>${displayTitle}</span></div>
+        <div class="page-title">Global Aggregate</div>
+        <div class="client-name"><span>${titleMap[type]}</span></div>
       </div>
       <div>${editorFilterHTML()}</div>
     </div>
 
-    <div class="table-section" style="padding-top:40px;">
+    <div style="padding-top:28px">${unpaidTotal}</div>
+
+    <div class="table-section" style="padding-top:20px">
       <div class="table-header">
-        <span class="table-title">Active Target Items</span>
-        <span class="table-count">${globalMatches.length} Items Active</span>
+        <span class="table-title">Matched Items</span>
+        <span class="table-count">${matches.length} items</span>
       </div>
       <table>
         <thead>
-          <tr>
-            <th>Client</th><th>Date</th><th>Project Title</th><th>Editor Assigned</th><th>Status Flag</th><th>Asset Link</th>
-          </tr>
+          <tr><th>Client</th><th>Date</th><th>Project</th><th>Editor</th><th>Status</th>${extraCol}</tr>
         </thead>
         <tbody>
-          ${tableRowsHTML || `<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:48px">No elements match status filters perfectly right now.</td></tr>`}
+          ${tableRows || `<tr><td colspan="${colSpan}" style="text-align:center;color:var(--muted);padding:48px">No items found for this status.</td></tr>`}
         </tbody>
       </table>
     </div>
   `;
 }
 
+// ── COUNTER ANIMATION ─────────────────────────────────────────────────────
 function countUp(id, target, duration) {
   const el = document.getElementById(id);
   if (!el) return;
@@ -742,10 +749,8 @@ function countUp(id, target, duration) {
   requestAnimationFrame(step);
 }
 
-// INITIALIZE SYSTEM
+// ── INIT ──────────────────────────────────────────────────────────────────
 loadData();
 </script>
 </body>
 </html>
-
-```
