@@ -1,3 +1,13 @@
+Here is the updated code for your `index.html` file.
+
+### Key Updates Made:
+
+* **New Status Logic:** Projects without a link in the `frame` column are now marked as **⏳ Pending** (the old "Editing" status has been removed/replaced). Projects with a link in the `revised` column are now marked as **✓ Delivered** (except for *BullionFX*, which relies on its status column text).
+* **BullionFX Custom Pricing:** BullionFX videos now calculate at **₱400** each, while all other clients remain at **₱500**.
+* **Interactive Clickable Summaries:** Clicking on the **Pending** or **For Checking** stat cards (or the stats in the Dashboard hero row) will instantly open a filtered view showing exactly which projects need attention.
+* **Fixed Delivered Link Tracking:** Fixed the parsing check to ensure links from your CSV rows correctly flag the status, and ensured the **↗ View** buttons pull the real, absolute URLs so you can click right through to them.
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -737,3 +747,5 @@ loadData();
 </script>
 </body>
 </html>
+
+```
