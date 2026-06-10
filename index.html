@@ -196,7 +196,6 @@
 
   /* ── PER-PROJECT INLINE EDIT ── */
   .amount-cell { position: relative; display: inline-flex; align-items: center; gap: 5px; cursor: default; }
-  .amount-cell[data-overridden="true"] .amount { text-decoration: underline dotted; text-underline-offset: 3px; }
   .amount-cell .edit-hint {
     font-size: 9px; color: var(--muted); opacity: 0; transition: opacity 0.15s;
     letter-spacing: 0.5px; text-transform: uppercase; font-family: 'Inter', sans-serif;
@@ -214,12 +213,7 @@
   }
   .amount-inline-input::-webkit-inner-spin-button,
   .amount-inline-input::-webkit-outer-spin-button { -webkit-appearance: none; }
-  .reset-price-btn {
-    font-size: 10px; color: var(--muted); background: none; border: none;
-    cursor: pointer; padding: 0 4px; line-height: 1; transition: color 0.15s;
-    font-family: 'Inter', sans-serif;
-  }
-  .reset-price-btn:hover { color: var(--red); }
+
 
   /* ── PRICING MANAGER ── */
   .pricing-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; padding: 28px 40px 40px; }
@@ -267,11 +261,50 @@
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
-  @media (max-width: 700px) {
-    .sidebar { width: 56px; }
-    .sidebar-logo-text, .nav-item-label, .sidebar-section, .nav-count, .refresh-btn-label, .last-updated { display: none; }
-    .page-header, .stats-row, .table-section, .hero, .status-legend, .pricing-grid, .pricing-save-bar { padding-left: 20px; padding-right: 20px; }
-  }
+@media (max-width: 700px) {
+  .sidebar { width: 56px; }
+  .sidebar-logo-text, .nav-item-label, .sidebar-section, .nav-count, .refresh-btn-label, .last-updated { display: none; }
+  .page-header, .stats-row, .table-section, .hero, .status-legend, .pricing-grid, .pricing-save-bar { padding-left: 16px; padding-right: 16px; }
+  .page-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+  .client-name { font-size: 32px; }
+  .hero { padding-top: 32px; }
+  .hero-earnings { font-size: clamp(56px, 18vw, 90px); }
+  .hero-breakdown { gap: 16px; justify-content: center; }
+  .hero-divider { display: none; }
+  .hero-stat { min-width: 90px; }
+  .hero-stat-val { font-size: 24px; }
+  .stats-row { gap: 12px; }
+  .stat-card { min-width: 100%; padding: 18px; }
+  .stat-value { font-size: 30px; }
+  .stat-card.earnings .stat-value { font-size: 36px; }
+  .editor-earnings { gap: 12px; }
+  .editor-card { width: 100%; min-width: unset; padding: 16px; }
+  .editor-card-amt { font-size: 30px; }
+  .status-legend { gap: 10px; }
+  .legend-item { font-size: 11px; }
+  .pricing-grid { grid-template-columns: 1fr; gap: 12px; }
+  .pricing-save-bar { flex-direction: column; align-items: stretch; gap: 10px; }
+  .pricing-save-btn, .pricing-reset-btn { width: 100%; }
+  .pricing-reset-btn { margin-left: 0; }
+  .table-section { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { min-width: 700px; }
+  th, td { padding: 10px; white-space: nowrap; }
+  .amount-inline-input { width: 70px; }
+  .table-header { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .pricing-input { font-size: 28px; }
+  .editor-filter { width: 100%; }
+  .editor-btn { font-size: 11px; padding: 6px 10px; }
+}
+
+@media (max-width: 480px) {
+  .client-name { font-size: 28px; }
+  .hero-earnings { font-size: clamp(48px, 16vw, 72px); }
+  .hero-stat-val { font-size: 20px; }
+  .stat-card.earnings .stat-value { font-size: 32px; }
+  .editor-card-amt { font-size: 26px; }
+  .pricing-input { font-size: 24px; }
+  .page-header, .stats-row, .table-section, .hero, .status-legend, .pricing-grid, .pricing-save-bar { padding-left: 12px; padding-right: 12px; }
+}
 </style>
 </head>
 <body>
@@ -323,19 +356,22 @@
 // ═══════════════════════════════════════════════════════════════════════════
 const RATE_DEFAULTS = {
   'LHF': 500, 'Boney': 500, 'L&S': 500, 'Jeya': 500,
-  'AM Market': 500, 'BullionFX': 400, 'Goreng Story': 500
+  'AM Market': 500, 'BullionFX': 500, 'Goreng Story': 500
 };
 
 let clientRates = {};
+let futureClientRates = {};
+let projectPriceSnapshots = {};
 
 function loadRates() {
   try {
     const saved = localStorage.getItem('clientRates');
     clientRates = saved ? JSON.parse(saved) : { ...RATE_DEFAULTS };
-    // Fill in any missing clients with defaults
     for (const [k, v] of Object.entries(RATE_DEFAULTS)) {
       if (clientRates[k] === undefined) clientRates[k] = v;
     }
+    // Force BullionFX back to 500
+    clientRates['BullionFX'] = 500;
   } catch (e) {
     clientRates = { ...RATE_DEFAULTS };
   }
@@ -345,13 +381,45 @@ function saveRates() {
   localStorage.setItem('clientRates', JSON.stringify(clientRates));
 }
 
+function loadFutureRates() {
+  try {
+    const saved = localStorage.getItem('futureClientRates');
+    futureClientRates = saved ? JSON.parse(saved) : { ...clientRates };
+  } catch (e) {
+    futureClientRates = { ...clientRates };
+  }
+  for (const [k, v] of Object.entries(RATE_DEFAULTS)) {
+    if (futureClientRates[k] === undefined) {
+      futureClientRates[k] = clientRates[k] ?? v;
+    }
+  }
+  // Force BullionFX back to 500
+  futureClientRates['BullionFX'] = 500;
+}
+
+function saveFutureRates() {
+  localStorage.setItem('futureClientRates', JSON.stringify(futureClientRates));
+}
+
+function loadProjectSnapshots() {
+  try {
+    const saved = localStorage.getItem('projectPriceSnapshots');
+    projectPriceSnapshots = saved ? JSON.parse(saved) : {};
+  } catch (e) {
+    projectPriceSnapshots = {};
+  }
+}
+
+function saveProjectSnapshots() {
+  localStorage.setItem('projectPriceSnapshots', JSON.stringify(projectPriceSnapshots));
+}
+
 function getRate(clientName) {
   return clientRates[clientName] !== undefined ? clientRates[clientName] : 500;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
 // PER-PROJECT PRICE OVERRIDES
-// Key format: "ClientName||ProjectName"
 // ═══════════════════════════════════════════════════════════════════════════
 let projectOverrides = {};
 
@@ -371,14 +439,25 @@ function getProjectKey(clientName, projectName) {
 }
 
 function getProjectRate(clientName, projectName) {
-  const key = getProjectKey(clientName, projectName);
-  return projectOverrides[key] !== undefined ? projectOverrides[key] : getRate(clientName);
+  const overrideKey = getProjectKey(clientName, projectName);
+  if (projectOverrides[overrideKey] !== undefined) {
+    return projectOverrides[overrideKey];
+  }
+  if (projectPriceSnapshots[overrideKey] !== undefined) {
+    return projectPriceSnapshots[overrideKey];
+  }
+  const rate = futureClientRates[clientName] ?? getRate(clientName);
+  projectPriceSnapshots[overrideKey] = rate;
+  saveProjectSnapshots();
+  return rate;
 }
 
 function setProjectRate(clientName, projectName, value) {
   const key = getProjectKey(clientName, projectName);
   projectOverrides[key] = value;
   saveProjectOverrides();
+  // Re-render immediately — no pending state, no refresh button
+  renderAll();
 }
 
 function resetProjectRate(clientName, projectName) {
@@ -435,30 +514,18 @@ let activeTab  = 'home';
 let activeEditor = 'all';
 
 // ═══════════════════════════════════════════════════════════════════════════
-// STATUS SYSTEMS — TWO SEPARATE FUNCTIONS
+// STATUS SYSTEMS
 // ═══════════════════════════════════════════════════════════════════════════
-
-/**
- * WORKFLOW STATUS — derived exclusively from frame/revised columns.
- * Returns: 'exported' | 'checking' | 'pending' | null (empty row)
- * Never touches the payment/status column.
- */
 function getWorkflowStatus(row) {
   const hasRevised = !!(row.revised && row.revised.trim());
   const hasFrame   = !!(row.frame   && row.frame.trim());
   const hasProject = !!(row.project && row.project.trim());
-
-  if (!hasProject) return null;         // empty row — ignore entirely
-  if (hasRevised)  return 'exported';   // revised exists → exported (regardless of frame)
-  if (hasFrame)    return 'checking';   // frame only → for checking
-  return 'pending';                     // neither → pending
+  if (!hasProject) return null;
+  if (hasRevised)  return 'exported';
+  if (hasFrame)    return 'checking';
+  return 'pending';
 }
 
-/**
- * PAYMENT STATUS — derived exclusively from the spreadsheet status column.
- * Returns: 'paid' | 'unpaid' | null (no payment info)
- * Never touches frame or revised.
- */
 function getPaymentStatus(row) {
   const st = (row.status || '').toLowerCase().trim();
   if (!st) return null;
@@ -487,7 +554,6 @@ function parseCSV(text, clientDef) {
   if (lines.length < 2) return [];
   const { cols } = clientDef;
   const rows = [];
-
   for (let i = 1; i < lines.length; i++) {
     const c       = splitCSVLine(lines[i]);
     const date    = (c[cols.date]    || '').trim();
@@ -496,13 +562,8 @@ function parseCSV(text, clientDef) {
     const frame   = (c[cols.frame]   || '').trim();
     const revised = (c[cols.revised] || '').trim();
     const status  = (c[cols.status]  || '').trim();
-
-    // Exclude Val editors entirely — before any counting
     if (editor.toLowerCase().includes('val')) continue;
-
-    // Skip completely empty rows
     if (!date && !project) continue;
-
     rows.push({ date, editor, project, frame, revised, status });
   }
   return rows;
@@ -545,7 +606,6 @@ function computeClientStats(rows, clientName) {
   const f    = filterByEditor(rows);
   const tally = { paid:0, unpaid:0, exported:0, checking:0, pending:0 };
   let earnings = 0, pendingAmount = 0;
-
   for (const r of f) {
     const ws = getWorkflowStatus(r);
     const ps = getPaymentStatus(r);
@@ -555,7 +615,6 @@ function computeClientStats(rows, clientName) {
     if (ps === 'paid')   earnings      += rate;
     if (ps === 'unpaid') pendingAmount += rate;
   }
-
   return {
     total:         f.filter(r => getWorkflowStatus(r) !== null).length,
     paid:          tally.paid,
@@ -572,7 +631,6 @@ function computeGlobal() {
   const tally = { paid:0, unpaid:0, exported:0, checking:0, pending:0 };
   const editorMap = {};
   let total = 0;
-
   for (const [clientName, rows] of Object.entries(allData)) {
     for (const r of filterByEditor(rows)) {
       const ws   = getWorkflowStatus(r);
@@ -589,7 +647,6 @@ function computeGlobal() {
       if (ps === 'paid') editorMap[ed].earnings += rate;
     }
   }
-
   return { total, ...tally, editorMap };
 }
 
@@ -615,7 +672,7 @@ function badgeHTML(status) {
     unpaid:   ['badge-unpaid',   '✕ Not Paid'],
     exported: ['badge-exported', '✓ Exported'],
     checking: ['badge-checking', '⏳ For Checking'],
-    pending:  ['badge-pending',  '⏳ Pending'],
+    pending:  ['badge-pending',  '⏅ Pending'],
   };
   const [cls, label] = map[status] || ['badge-pending', status];
   return `<span class="badge ${cls}">${label}</span>`;
@@ -655,10 +712,6 @@ function editorTagHTML(editor) {
   return `<span class="editor-tag ${cls}" title="${fullName}">${editor || '–'}</span>`;
 }
 
-/**
- * VIDEO COLUMN — shows "Exported" if revised has any value, dash otherwise.
- * No links, no URL validation, no href.
- */
 function videoColHTML(row) {
   const hasRevised = !!(row.revised && row.revised.trim());
   if (hasRevised) return `<span class="badge badge-exported">Exported</span>`;
@@ -670,21 +723,15 @@ function amountCellHTML(paymentStatus, clientName, projectName) {
     return `<span style="color:var(--muted)">–</span>`;
   }
   const rate       = getProjectRate(clientName, projectName);
-  const overridden = hasProjectOverride(clientName, projectName);
   const cls        = paymentStatus === 'paid' ? 'earned' : 'owed';
   const safeClient  = encodeURIComponent(clientName);
   const safeProject = encodeURIComponent(projectName);
-  const resetBtn   = overridden
-    ? `<button class="reset-price-btn" title="Reset to client default (${fmt(getRate(clientName))})"
-         onclick="event.stopPropagation();doResetProjectRate('${safeClient}','${safeProject}')">↺</button>`
-    : '';
-  return `<span class="amount-cell" data-overridden="${overridden}"
+  return `<span class="amount-cell"
       data-client="${safeClient}" data-project="${safeProject}"
       ondblclick="startInlineEdit(this)"
       title="Double-click to set a custom price for this project">
     <span class="amount ${cls}">${fmt(rate)}</span>
     <span class="edit-pencil">✎</span>
-    ${resetBtn}
   </span>`;
 }
 
@@ -711,7 +758,7 @@ function startInlineEdit(cell) {
     committed = true;
     const val = parseInt(input.value, 10);
     if (!isNaN(val) && val >= 0) setProjectRate(clientName, projectName, val);
-    renderAll();
+    else renderAll();
   }
   input.addEventListener('keydown', e => {
     if (e.key === 'Enter')  { e.preventDefault(); commit(); }
@@ -749,10 +796,8 @@ function renderAll() {
 function renderSidebar() {
   const nav    = document.getElementById('client-nav');
   const colors = ['#60a5fa','#f472b6','#34d399','#a78bfa','#fb923c','#e879f9','#f9a8d4'];
-
   document.getElementById('nav-home').className    = activeTab === 'home'    ? 'nav-item active' : 'nav-item';
   document.getElementById('nav-pricing').className = activeTab === 'pricing' ? 'nav-item active' : 'nav-item';
-
   nav.innerHTML = Object.keys(allData).map((c, i) => {
     const count  = filterByEditor(allData[c]).filter(r => getWorkflowStatus(r) !== null).length;
     const active = activeTab === c ? 'active' : '';
@@ -867,7 +912,6 @@ function renderClient(clientName) {
   const rows     = allData[clientName] || [];
   const filtered = filterByEditor(rows).filter(r => getWorkflowStatus(r) !== null);
   const s        = computeClientStats(rows, clientName);
-  const rate     = getRate(clientName);
 
   const tableRows = filtered.map(r => {
     const ws = getWorkflowStatus(r);
@@ -943,8 +987,6 @@ function renderSummaryPage(type) {
   el.style.display = '';
 
   const titleMap = { pending:'Pending Workspace', checking:'For Checking Summary', unpaid:'Unpaid Summary' };
-
-  // workflow types use getWorkflowStatus; 'unpaid' uses getPaymentStatus
   const isPaymentType = (type === 'unpaid');
   const matches = [];
   let aggregateOwedSum = 0;
@@ -969,9 +1011,7 @@ function renderSummaryPage(type) {
     : '';
 
   const tableRows = matches.map(({ client, r }) => {
-    const rate = getProjectRate(client, r.project);
-    const ws   = getWorkflowStatus(r);
-    const ps   = getPaymentStatus(r);
+    const ps = getPaymentStatus(r);
     return `<tr>
       <td><span style="font-weight:600;color:var(--gold)">${client}</span></td>
       <td><span style="color:var(--muted);font-size:12px">${r.date || '–'}</span></td>
@@ -1054,8 +1094,8 @@ function renderPricing() {
 
     <div class="pricing-save-bar">
       <button class="pricing-save-btn" onclick="savePricingFromUI()">Save Rates</button>
+      <button class="pricing-save-btn" onclick="saveFutureRatesOnly()">Save Future Rates</button>
       <span class="pricing-saved-msg" id="pricing-saved-msg">✓ Rates saved</span>
-      <button class="pricing-reset-btn" onclick="resetRates()">Reset to Defaults</button>
     </div>
 
     <div style="padding: 0 40px 40px">
@@ -1072,33 +1112,61 @@ function renderPricing() {
 }
 
 function onRateChange(input) {
-  // Live update in-memory so totals reflect immediately if user navigates away
   const client = input.getAttribute('data-client');
   const val    = parseInt(input.value, 10);
   if (!isNaN(val) && val >= 0) clientRates[client] = val;
 }
 
 function savePricingFromUI() {
-  // Read all inputs and save
   for (const clientName of Object.keys(RATE_DEFAULTS)) {
     const id  = 'rate-' + clientName.replace(/[^a-z0-9]/gi, '_');
     const inp = document.getElementById(id);
-    if (inp) {
-      const val = parseInt(inp.value, 10);
-      if (!isNaN(val) && val >= 0) clientRates[clientName] = val;
-    }
+    if (!inp) continue;
+    const val = parseInt(inp.value, 10);
+    if (isNaN(val) || val < 0) continue;
+    clientRates[clientName] = val;
+    futureClientRates[clientName] = val;
+    Object.keys(projectPriceSnapshots).forEach(key => {
+      if (key.startsWith(clientName + '||')) {
+        projectPriceSnapshots[key] = val;
+      }
+    });
   }
   saveRates();
+  saveFutureRates();
+  saveProjectSnapshots();
 
-  // Flash confirmation
   const msg = document.getElementById('pricing-saved-msg');
   if (msg) {
+    msg.textContent = '✓ Rates saved';
     msg.classList.add('show');
     setTimeout(() => msg.classList.remove('show'), 2500);
   }
 
-  // Re-render everything so all counts/earnings update with new rates
   renderAll();
+}
+
+function saveFutureRatesOnly() {
+  for (const clientName of Object.keys(RATE_DEFAULTS)) {
+    const id  = 'rate-' + clientName.replace(/[^a-z0-9]/gi, '_');
+    const inp = document.getElementById(id);
+    if (!inp) continue;
+    const val = parseInt(inp.value, 10);
+    if (!isNaN(val) && val >= 0) {
+      futureClientRates[clientName] = val;
+    }
+  }
+  saveFutureRates();
+
+  const msg = document.getElementById('pricing-saved-msg');
+  if (msg) {
+    msg.textContent = '✓ Future rates saved';
+    msg.classList.add('show');
+    setTimeout(() => {
+      msg.textContent = '✓ Rates saved';
+      msg.classList.remove('show');
+    }, 2500);
+  }
 }
 
 function resetRates() {
@@ -1125,7 +1193,9 @@ function countUp(id, target, duration) {
 
 // ── INIT ──────────────────────────────────────────────────────────────────
 loadRates();
+loadFutureRates();
 loadProjectOverrides();
+loadProjectSnapshots();
 applySidebarState();
 loadData();
 </script>
