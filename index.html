@@ -181,7 +181,7 @@
   .editor-aus  { background: rgba(217,119,6,0.15);  color: #d97706; }
   .editor-neil { background: rgba(34,197,94,0.15);  color: #22c55e; }
 
-  /* RESOURCE INTERACTIVE LINKS */
+  /* VIDEO LINK */
   .resource-link {
     display: inline-flex; align-items: center; gap: 4px;
     font-size: 11px; color: var(--blue); text-decoration: none;
@@ -314,21 +314,25 @@ let allData = {};
 let activeTab = 'home';
 let activeEditor = 'all';
 
-// ── STATUS LOGIC (single source of truth) ─────────────────────────────────
-function getProjectStatus(row, clientName) {
-  const st = (row.status || '').toLowerCase().trim();
+// ── STATUS LOGIC ──────────────────────────────────────────────────────────
+// CHANGE 4 & 5: Rebuilt status logic using ONLY frame and revised columns.
+// Priority order: revised first, then frame, then pending.
+// A row with a revised link is ALWAYS exported — regardless of frame state.
+// Previously the code checked `st.includes('paid')` etc. from a status text
+// column, which caused rows with revised links to sometimes fall through to
+// 'checking' if the status column didn't match. Now we ignore the status
+// column entirely for workflow state.
+function getProjectStatus(row) {
+  const hasRevised = !!(row.revised && row.revised.trim());
+  const hasFrame   = !!(row.frame   && row.frame.trim());
+  const hasProject = !!(row.project && row.project.trim());
 
-  if (st.includes('paid') && !st.includes('not')) return 'paid';
-  if (st.includes('not paid') || st.includes('unpaid'))  return 'unpaid';
+  // Must have a project name to count at all
+  if (!hasProject) return null;
 
-  // If there is any string content in the revised column, it is treated as exported
-  const hasRevised = row.revised && row.revised.trim();
-  if (hasRevised) return 'exported';
-
-  const hasFrame = row.frame && row.frame.trim();
-  if (hasFrame) return 'checking';
-
-  return 'pending';
+  if (hasRevised)          return 'exported';  // revised present → always exported
+  if (hasFrame)            return 'checking';  // frame only → for checking
+  return 'pending';                            // nothing → pending
 }
 
 // ── CSV HELPERS ───────────────────────────────────────────────────────────
@@ -359,6 +363,13 @@ function parseCSV(text, clientDef) {
     const revised = (c[cols.revised] || '').trim();
     const status  = (c[cols.status]  || '').trim();
 
+    // CHANGE 3: Exclude rows where editor name contains 'val' (case-insensitive).
+    // This covers Val, VAL, val, Valerie, etc.
+    // These rows are excluded BEFORE any counting, so they never appear
+    // in totals, tables, summaries, or editor statistics.
+    if (editor.toLowerCase().includes('val')) continue;
+
+    // Skip rows with no date AND no project (truly empty rows)
     if (!date && !project) continue;
 
     rows.push({ date, editor, project, frame, revised, status });
@@ -399,14 +410,22 @@ function filterByEditor(rows) {
 
 function computeClientStats(rows, clientName) {
   const f = filterByEditor(rows);
+  // NOTE: paid/unpaid are no longer derived from getProjectStatus (which is
+  // now frame/revised-only). We keep them as zero here since the new status
+  // logic has no paid/unpaid states — those were driven by the old status
+  // column. If paid/unpaid tracking is needed in the future it should come
+  // from a dedicated payment column, not mixed into workflow status.
   const tally = { paid:0, unpaid:0, exported:0, checking:0, pending:0 };
   const rate = getRate(clientName);
-  for (const r of f) tally[getProjectStatus(r, clientName)]++;
+  for (const r of f) {
+    const s = getProjectStatus(r);
+    if (s) tally[s] = (tally[s] || 0) + 1;
+  }
   return {
-    total: f.length,
+    total: f.filter(r => getProjectStatus(r) !== null).length,
     ...tally,
-    earnings:       tally.paid   * rate,
-    pendingAmount:  tally.unpaid * rate,
+    earnings:      tally.paid   * rate,
+    pendingAmount: tally.unpaid * rate,
   };
 }
 
@@ -418,8 +437,9 @@ function computeGlobal() {
   for (const [clientName, rows] of Object.entries(allData)) {
     const rate = getRate(clientName);
     for (const r of filterByEditor(rows)) {
+      const s = getProjectStatus(r);
+      if (!s) continue;  // skip rows with no project name
       total++;
-      const s = getProjectStatus(r, clientName);
       tally[s] = (tally[s] || 0) + 1;
 
       const ed = r.editor || 'Unknown';
@@ -429,10 +449,7 @@ function computeGlobal() {
     }
   }
 
-  return {
-    total, ...tally,
-    editorMap,
-  };
+  return { total, ...tally, editorMap };
 }
 
 function getGlobalEarningsBreakdown() {
@@ -441,8 +458,8 @@ function getGlobalEarningsBreakdown() {
   for (const [clientName, rows] of Object.entries(allData)) {
     const rate = getRate(clientName);
     for (const r of filterByEditor(rows)) {
-      const s = getProjectStatus(r, clientName);
-      if (s === 'paid') paidSum += rate;
+      const s = getProjectStatus(r);
+      if (s === 'paid')   paidSum   += rate;
       if (s === 'unpaid') unpaidSum += rate;
     }
   }
@@ -467,8 +484,14 @@ function fmt(n) { return '₱' + n.toLocaleString(); }
 function getEditors() {
   const s = new Set();
   for (const rows of Object.values(allData)) {
+    // CHANGE 3: Val is already excluded at parse time, but double-guard here
+    // to ensure no val-named editor ever appears in the filter buttons.
     rows.forEach(r => {
-      if (r.editor && r.editor.trim() && r.editor.toLowerCase() !== 'val') s.add(r.editor);
+      if (r.editor && r.editor.trim()
+          && r.editor.toLowerCase() !== 'val'
+          && !r.editor.toLowerCase().includes('val')) {
+        s.add(r.editor);
+      }
     });
   }
   return [...s].sort();
@@ -502,6 +525,18 @@ function amountCellHTML(status, clientName) {
   return `<span style="color:var(--muted)">–</span>`;
 }
 
+// CHANGE 1 & 2: Video link helper.
+// Always uses row.revised ONLY — never falls back to row.frame.
+// Label changed from "View Resource" → "View Video".
+function videoLinkHTML(row) {
+  const targetLink = (row.revised || '').trim();
+  const hasValidLink = targetLink.startsWith('http://') || targetLink.startsWith('https://');
+  if (hasValidLink) {
+    return `<a class="resource-link" href="${targetLink}" target="_blank" rel="noopener noreferrer">↗ View Video</a>`;
+  }
+  return `<span class="resource-none">No link attached</span>`;
+}
+
 // ── RENDER PIPELINE ────────────────────────────────────────────────────────
 function setEditor(name) { activeEditor = name; renderAll(); }
 function switchTab(tab) { activeTab = tab; renderAll(); window.scrollTo(0,0); }
@@ -522,7 +557,7 @@ function renderSidebar() {
   document.getElementById('nav-home').className = activeTab === 'home' ? 'nav-item active' : 'nav-item';
 
   nav.innerHTML = Object.keys(allData).map((c, i) => {
-    const count = filterByEditor(allData[c]).length;
+    const count = filterByEditor(allData[c]).filter(r => getProjectStatus(r) !== null).length;
     const active = activeTab === c ? 'active' : '';
     return `<div class="nav-item ${active}" onclick="switchTab('${c}')">
       <div class="dot" style="background:${colors[i % colors.length]}"></div>
@@ -611,7 +646,7 @@ function renderHome() {
       <span class="legend-label">Status key:</span>
       <span class="legend-item"><span class="legend-dot" style="background:#22c55e"></span>Paid</span>
       <span class="legend-item"><span class="legend-dot" style="background:#ef4444"></span>Not Paid</span>
-      <span class="legend-item"><span class="legend-dot" style="background:#2dd4bf"></span>Exported — revised file link attached</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#2dd4bf"></span>Exported — revised video link attached</span>
       <span class="legend-item"><span class="legend-dot" style="background:#fbbf24"></span>For Checking — frame link active, awaiting revised link</span>
       <span class="legend-item"><span class="legend-dot" style="background:#a78bfa"></span>Pending — frame link empty / not started</span>
     </div>
@@ -629,25 +664,19 @@ function renderClient(clientName) {
   el.style.display = '';
 
   const rows = allData[clientName] || [];
-  const filtered = filterByEditor(rows);
+  const filtered = filterByEditor(rows).filter(r => getProjectStatus(r) !== null);
   const s = computeClientStats(rows, clientName);
   const rate = getRate(clientName);
 
+  // CHANGE 1: Table header "Asset Link" → "Video"
   const tableRows = filtered.map(r => {
-    const ps = getProjectStatus(r, clientName);
-    
-    let targetLink = (r.revised || r.frame || '').trim();
-    let hasValidLink = targetLink.startsWith('http://') || targetLink.startsWith('https://');
-    let linkColumnMarkup = hasValidLink
-      ? `<a class="resource-link" href="${targetLink}" target="_blank" rel="noopener noreferrer">↗ View Resource</a>`
-      : `<span class="resource-none">No link discovered</span>`;
-
+    const ps = getProjectStatus(r);
     return `<tr>
       <td><span style="color:var(--muted);font-size:12px">${r.date || '–'}</span></td>
       <td class="project-name">${r.project || '–'}</td>
       <td>${editorTagHTML(r.editor)}</td>
       <td>${badgeHTML(ps)}</td>
-      <td>${linkColumnMarkup}</td>
+      <td>${videoLinkHTML(r)}</td>
       <td>${amountCellHTML(ps, clientName)}</td>
     </tr>`;
   }).join('');
@@ -696,7 +725,7 @@ function renderClient(clientName) {
       </div>
       <table>
         <thead>
-          <tr><th>Date</th><th>Project</th><th>Editor</th><th>Status</th><th>Asset Link</th><th>Amount</th></tr>
+          <tr><th>Date</th><th>Project</th><th>Editor</th><th>Status</th><th>Video</th><th>Amount</th></tr>
         </thead>
         <tbody>${tableRows || '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:32px">No projects found.</td></tr>'}</tbody>
       </table>
@@ -723,11 +752,9 @@ function renderSummaryPage(type) {
   for (const [clientName, rows] of Object.entries(allData)) {
     const rate = getRate(clientName);
     for (const r of filterByEditor(rows)) {
-      if (getProjectStatus(r, clientName) === type) {
+      if (getProjectStatus(r) === type) {
         matches.push({ client: clientName, r });
-        if (type === 'unpaid') {
-          aggregateOwedSum += rate;
-        }
+        if (type === 'unpaid') aggregateOwedSum += rate;
       }
     }
   }
@@ -739,21 +766,17 @@ function renderSummaryPage(type) {
        </div>`
     : '';
 
+  // CHANGE 1: Column header "Resource Asset" → "Video Link"
+  // CHANGE 2: Link always comes from row.revised via videoLinkHTML()
   const tableRows = matches.map(({ client, r }) => {
     const rate = getRate(client);
-    let targetLink = (r.revised || r.frame || '').trim();
-    let hasValidLink = targetLink.startsWith('http://') || targetLink.startsWith('https://');
-    let linkColumnMarkup = hasValidLink
-      ? `<a class="resource-link" href="${targetLink}" target="_blank" rel="noopener noreferrer">↗ View Resource</a>`
-      : `<span class="resource-none">No link attached</span>`;
-
     return `<tr>
       <td><span style="font-weight:600;color:var(--gold)">${client}</span></td>
       <td><span style="color:var(--muted);font-size:12px">${r.date || '–'}</span></td>
       <td class="project-name">${r.project || '–'}</td>
       <td>${editorTagHTML(r.editor)}</td>
       <td>${badgeHTML(type)}</td>
-      <td>${linkColumnMarkup}</td>
+      <td>${videoLinkHTML(r)}</td>
       ${type === 'unpaid' ? `<td><span class="amount owed">${fmt(rate)}</span></td>` : ''}
     </tr>`;
   }).join('');
@@ -779,7 +802,7 @@ function renderSummaryPage(type) {
       </div>
       <table>
         <thead>
-          <tr><th>Client</th><th>Date</th><th>Project</th><th>Editor</th><th>Status</th><th>Resource Asset</th>${extraCol}</tr>
+          <tr><th>Client</th><th>Date</th><th>Project</th><th>Editor</th><th>Status</th><th>Video Link</th>${extraCol}</tr>
         </thead>
         <tbody>
           ${tableRows || `<tr><td colspan="${colSpan}" style="text-align:center;color:var(--muted);padding:48px">No items found for this status.</td></tr>`}
