@@ -7,62 +7,85 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0d0d0f;
-    --surface: #141418;
-    --surface2: #1c1c22;
-    --border: #2a2a32;
-    --gold: #f5a623;
-    --gold-dim: #c47d0e;
-    --gold-glow: rgba(245,166,35,0.15);
-    --green: #22c55e;
-    --red: #ef4444;
-    --blue: #60a5fa;
-    --purple: #a78bfa;
-    --amber: #fbbf24;
-    --teal: #2dd4bf;
-    --muted: #6b7280;
-    --text: #e5e7eb;
-    --text2: #9ca3af;
+    --bg: #0d0d0f; --surface: #141418; --surface2: #1c1c22; --border: #2a2a32;
+    --gold: #f5a623; --gold-dim: #c47d0e; --gold-glow: rgba(245,166,35,0.15);
+    --green: #22c55e; --red: #ef4444; --blue: #60a5fa; --purple: #a78bfa;
+    --amber: #fbbf24; --teal: #2dd4bf; --muted: #6b7280; --text: #e5e7eb; --text2: #9ca3af;
+    --sidebar-w: 220px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh; overflow-x: hidden; }
   .app { display: flex; min-height: 100vh; }
 
-  /* SIDEBAR */
+  /* ── SIDEBAR ── */
   .sidebar {
-    width: 220px; background: var(--surface); border-right: 1px solid var(--border);
+    width: var(--sidebar-w); background: var(--surface); border-right: 1px solid var(--border);
     display: flex; flex-direction: column; flex-shrink: 0;
-    position: sticky; top: 0; height: 100vh; overflow-y: auto;
+    position: sticky; top: 0; height: 100vh; overflow-y: auto; overflow-x: hidden;
+    transition: width 0.22s cubic-bezier(0.4,0,0.2,1);
   }
-  .sidebar-logo { padding: 24px 20px 16px; border-bottom: 1px solid var(--border); }
+  .sidebar.collapsed { width: 56px; }
+
+  .sidebar-logo {
+    padding: 16px 14px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-shrink: 0;
+  }
+  .sidebar-logo-text { overflow: hidden; white-space: nowrap; transition: opacity 0.15s, width 0.15s; }
+  .sidebar.collapsed .sidebar-logo-text { opacity: 0; width: 0; pointer-events: none; }
   .sidebar-logo .suite { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; color: var(--gold); }
   .sidebar-logo .sub { font-size: 10px; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; margin-top: 2px; }
-  .sidebar-section { padding: 16px 12px 8px; font-size: 10px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; }
+
+  .sidebar-toggle {
+    background: none; border: 1px solid var(--border); border-radius: 6px;
+    color: var(--muted); cursor: pointer; padding: 5px 7px; font-size: 14px; line-height: 1;
+    flex-shrink: 0; transition: color 0.15s, border-color 0.15s;
+  }
+  .sidebar-toggle:hover { color: var(--gold); border-color: rgba(245,166,35,0.4); }
+
+  .sidebar-section {
+    padding: 16px 12px 8px; font-size: 10px; letter-spacing: 2px;
+    color: var(--muted); text-transform: uppercase; white-space: nowrap;
+    overflow: hidden; transition: opacity 0.15s;
+  }
+  .sidebar.collapsed .sidebar-section { opacity: 0; height: 0; padding: 0; }
+
   .nav-item {
-    margin: 2px 8px; padding: 10px 12px; border-radius: 8px; cursor: pointer;
+    margin: 2px 8px; padding: 10px 10px; border-radius: 8px; cursor: pointer;
     font-size: 13px; font-weight: 500; color: var(--text2);
     display: flex; align-items: center; gap: 10px;
-    transition: all 0.15s; border: 1px solid transparent;
+    transition: all 0.15s; border: 1px solid transparent; white-space: nowrap; overflow: hidden;
   }
   .nav-item:hover { background: var(--surface2); color: var(--text); }
   .nav-item.active { background: var(--gold-glow); color: var(--gold); border-color: rgba(245,166,35,0.25); }
   .nav-item .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .nav-count { margin-left: auto; font-size: 11px; background: var(--surface2); padding: 2px 6px; border-radius: 10px; color: var(--muted); }
+  .nav-item-label { overflow: hidden; white-space: nowrap; transition: opacity 0.15s, max-width 0.15s; max-width: 200px; }
+  .sidebar.collapsed .nav-item-label { opacity: 0; max-width: 0; }
+  .nav-count {
+    margin-left: auto; font-size: 11px; background: var(--surface2);
+    padding: 2px 6px; border-radius: 10px; color: var(--muted);
+    transition: opacity 0.15s; flex-shrink: 0;
+  }
+  .sidebar.collapsed .nav-count { opacity: 0; width: 0; padding: 0; overflow: hidden; }
   .nav-item.active .nav-count { background: rgba(245,166,35,0.2); color: var(--gold); }
-  .sidebar-bottom { margin-top: auto; padding: 16px; border-top: 1px solid var(--border); }
+
+  .sidebar-bottom { margin-top: auto; padding: 16px; border-top: 1px solid var(--border); overflow: hidden; }
+  .sidebar.collapsed .sidebar-bottom { padding: 10px 8px; }
   .refresh-btn {
     width: 100%; padding: 9px; background: var(--surface2); border: 1px solid var(--border);
     border-radius: 8px; color: var(--text2); font-size: 12px; cursor: pointer;
     font-family: 'Inter', sans-serif; transition: all 0.15s;
-    display: flex; align-items: center; justify-content: center; gap: 6px;
+    display: flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap;
   }
   .refresh-btn:hover { color: var(--gold); border-color: rgba(245,166,35,0.3); }
-  .last-updated { font-size: 10px; color: var(--muted); text-align: center; margin-top: 8px; }
+  .refresh-btn-label { transition: opacity 0.15s, max-width 0.15s; max-width: 200px; overflow: hidden; }
+  .sidebar.collapsed .refresh-btn-label { opacity: 0; max-width: 0; }
+  .last-updated { font-size: 10px; color: var(--muted); text-align: center; margin-top: 8px; transition: opacity 0.15s; white-space: nowrap; overflow: hidden; }
+  .sidebar.collapsed .last-updated { opacity: 0; height: 0; margin: 0; }
 
-  /* MAIN */
-  .main { flex: 1; overflow-y: auto; }
+  /* ── MAIN ── */
+  .main { flex: 1; overflow-y: auto; min-width: 0; }
 
-  /* HEADER */
+  /* ── HEADER ── */
   .page-header {
     padding: 32px 40px 0; display: flex; align-items: flex-start;
     justify-content: space-between; gap: 20px; flex-wrap: wrap;
@@ -71,7 +94,7 @@
   .client-name { font-family: 'Bebas Neue', sans-serif; font-size: 42px; letter-spacing: 2px; color: var(--text); line-height: 1; }
   .client-name span { color: var(--gold); }
 
-  /* EDITOR FILTER */
+  /* ── EDITOR FILTER ── */
   .editor-filter { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
   .filter-label { font-size: 11px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
   .editor-btn {
@@ -82,7 +105,7 @@
   .editor-btn:hover { border-color: var(--gold); color: var(--gold); }
   .editor-btn.active { background: var(--gold); color: #000; border-color: var(--gold); font-weight: 600; }
 
-  /* STATS ROW */
+  /* ── STATS ROW ── */
   .stats-row { display: flex; gap: 16px; padding: 28px 40px 0; flex-wrap: wrap; }
   .stat-card {
     background: var(--surface); border: 1px solid var(--border);
@@ -114,14 +137,10 @@
   .stat-card.exported-card .stat-value { color: var(--teal); }
   .stat-sub { font-size: 11px; color: var(--muted); margin-top: 6px; }
 
-  /* HERO */
+  /* ── HERO ── */
   .hero { padding: 48px 40px 0; text-align: center; }
   .hero-eyebrow { font-size: 11px; letter-spacing: 4px; color: var(--muted); text-transform: uppercase; margin-bottom: 16px; }
-  .hero-earnings {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(80px, 15vw, 160px);
-    letter-spacing: 4px; color: var(--gold); line-height: 1;
-  }
+  .hero-earnings { font-family: 'Bebas Neue', sans-serif; font-size: clamp(80px, 15vw, 160px); letter-spacing: 4px; color: var(--gold); line-height: 1; }
   .hero-currency { font-size: 0.4em; vertical-align: top; margin-top: 0.18em; color: var(--gold-dim); }
   .hero-sub { font-size: 14px; color: var(--muted); margin-top: 12px; letter-spacing: 1px; }
   .hero-breakdown { display: flex; justify-content: center; gap: 40px; margin-top: 40px; flex-wrap: wrap; }
@@ -135,42 +154,32 @@
   .hero-stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 2px; }
   .hero-divider { width: 1px; background: var(--border); align-self: stretch; }
   .editor-earnings { display: flex; justify-content: center; gap: 24px; margin-top: 32px; flex-wrap: wrap; }
-  .editor-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 12px; padding: 20px 32px; text-align: center; min-width: 180px;
-  }
+  .editor-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px 32px; text-align: center; min-width: 180px; }
   .editor-card-name { font-size: 12px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 2px; }
   .editor-card-fullname { font-size: 10px; color: var(--gold); margin-bottom: 8px; opacity: 0.85; }
   .editor-card-amt { font-family: 'Bebas Neue', sans-serif; font-size: 38px; color: var(--text); }
   .editor-card-amt .peso { font-size: 0.5em; color: var(--muted); vertical-align: top; margin-top: 0.2em; }
 
-  /* STATUS LEGEND */
+  /* ── STATUS LEGEND ── */
   .status-legend { display: flex; gap: 16px; flex-wrap: wrap; padding: 20px 40px 0; align-items: center; }
   .legend-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
   .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text2); }
   .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 
-  /* TABLE */
+  /* ── TABLE ── */
   .table-section { padding: 28px 40px 40px; }
   .table-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
   .table-title { font-size: 13px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 1.5px; }
   .table-count { font-size: 12px; color: var(--muted); }
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  th {
-    text-align: left; padding: 10px 14px; font-size: 10px; letter-spacing: 1.5px;
-    color: var(--muted); text-transform: uppercase; border-bottom: 1px solid var(--border); font-weight: 500;
-  }
+  th { text-align: left; padding: 10px 14px; font-size: 10px; letter-spacing: 1.5px; color: var(--muted); text-transform: uppercase; border-bottom: 1px solid var(--border); font-weight: 500; }
   td { padding: 12px 14px; border-bottom: 1px solid rgba(42,42,50,0.5); color: var(--text2); vertical-align: middle; }
   tr:last-child td { border-bottom: none; }
   tr:hover td { background: rgba(255,255,255,0.02); color: var(--text); }
   .project-name { color: var(--text); font-weight: 500; font-size: 13px; }
 
-  /* BADGES */
-  .badge {
-    display: inline-flex; align-items: center; gap: 5px;
-    padding: 3px 10px; border-radius: 20px; font-size: 11px;
-    font-weight: 600; letter-spacing: 0.5px;
-  }
+  /* ── BADGES ── */
+  .badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; }
   .badge-paid     { background: rgba(34,197,94,0.12);  color: #22c55e; border: 1px solid rgba(34,197,94,0.2); }
   .badge-unpaid   { background: rgba(239,68,68,0.12);  color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
   .badge-exported { background: rgba(45,212,191,0.12); color: #2dd4bf; border: 1px solid rgba(45,212,191,0.2); }
@@ -181,161 +190,286 @@
   .editor-aus  { background: rgba(217,119,6,0.15);  color: #d97706; }
   .editor-neil { background: rgba(34,197,94,0.15);  color: #22c55e; }
 
-  /* VIDEO LINK */
-  .resource-link {
-    display: inline-flex; align-items: center; gap: 4px;
-    font-size: 11px; color: var(--blue); text-decoration: none;
-    border: 1px solid rgba(96,165,250,0.25); border-radius: 6px; padding: 2px 8px;
-    transition: all 0.15s;
-  }
-  .resource-link:hover { background: rgba(96,165,250,0.1); border-color: var(--blue); }
-  .resource-none { font-size: 11px; color: var(--muted); font-style: italic; }
-
   .amount { font-family: 'Bebas Neue', sans-serif; font-size: 15px; color: var(--text); letter-spacing: 0.5px; }
   .amount.earned { color: var(--green); }
   .amount.owed   { color: var(--red); }
 
-  /* LOADING / ERROR */
+  /* ── PER-PROJECT INLINE EDIT ── */
+  .amount-cell { position: relative; display: inline-flex; align-items: center; gap: 5px; cursor: default; }
+  .amount-cell[data-overridden="true"] .amount { text-decoration: underline dotted; text-underline-offset: 3px; }
+  .amount-cell .edit-hint {
+    font-size: 9px; color: var(--muted); opacity: 0; transition: opacity 0.15s;
+    letter-spacing: 0.5px; text-transform: uppercase; font-family: 'Inter', sans-serif;
+  }
+  td:hover .amount-cell .edit-hint { opacity: 1; }
+  .amount-cell .edit-pencil {
+    font-size: 11px; color: var(--muted); opacity: 0; transition: opacity 0.15s; cursor: pointer;
+  }
+  td:hover .amount-cell .edit-pencil { opacity: 0.7; }
+  .amount-inline-input {
+    font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 0.5px;
+    background: var(--surface2); border: 1px solid var(--gold);
+    border-radius: 5px; color: var(--gold); padding: 2px 8px;
+    outline: none; width: 90px;
+  }
+  .amount-inline-input::-webkit-inner-spin-button,
+  .amount-inline-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+  .reset-price-btn {
+    font-size: 10px; color: var(--muted); background: none; border: none;
+    cursor: pointer; padding: 0 4px; line-height: 1; transition: color 0.15s;
+    font-family: 'Inter', sans-serif;
+  }
+  .reset-price-btn:hover { color: var(--red); }
+
+  /* ── PRICING MANAGER ── */
+  .pricing-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; padding: 28px 40px 40px; }
+  .pricing-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 20px 24px; position: relative; overflow: hidden;
+  }
+  .pricing-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--gold), transparent); border-radius: 12px 12px 0 0; }
+  .pricing-client { font-size: 11px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 12px; }
+  .pricing-input-row { display: flex; align-items: center; gap: 10px; }
+  .pricing-symbol { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--gold-dim); line-height: 1; }
+  .pricing-input {
+    font-family: 'Bebas Neue', sans-serif; font-size: 36px; color: var(--gold);
+    background: transparent; border: none; border-bottom: 2px solid var(--border);
+    outline: none; width: 100%; letter-spacing: 1px; line-height: 1; padding-bottom: 4px;
+    transition: border-color 0.15s;
+  }
+  .pricing-input:focus { border-color: var(--gold); }
+  .pricing-input::-webkit-inner-spin-button,
+  .pricing-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+  .pricing-hint { font-size: 11px; color: var(--muted); margin-top: 10px; }
+  .pricing-save-bar { padding: 0 40px 32px; display: flex; align-items: center; gap: 16px; }
+  .pricing-save-btn {
+    padding: 10px 28px; background: var(--gold); color: #000; border: none;
+    border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 700;
+    cursor: pointer; transition: opacity 0.15s;
+  }
+  .pricing-save-btn:hover { opacity: 0.88; }
+  .pricing-saved-msg { font-size: 12px; color: var(--green); opacity: 0; transition: opacity 0.4s; }
+  .pricing-saved-msg.show { opacity: 1; }
+  .pricing-reset-btn {
+    padding: 10px 20px; background: transparent; color: var(--muted); border: 1px solid var(--border);
+    border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 12px;
+    cursor: pointer; transition: all 0.15s; margin-left: auto;
+  }
+  .pricing-reset-btn:hover { color: var(--red); border-color: rgba(239,68,68,0.4); }
+
+  /* ── MISC ── */
   .state-msg { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 300px; gap: 16px; color: var(--muted); }
   .spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
   @keyframes countup { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
   .animate-in { animation: countup 0.6s cubic-bezier(0.22,1,0.36,1) both; }
-
-  /* SCROLLBAR */
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
   @media (max-width: 700px) {
-    .sidebar { width: 60px; }
-    .sidebar-logo .sub, .nav-item span, .sidebar-section, .nav-count { display: none; }
-    .page-header, .stats-row, .table-section, .hero, .status-legend { padding-left: 20px; padding-right: 20px; }
+    .sidebar { width: 56px; }
+    .sidebar-logo-text, .nav-item-label, .sidebar-section, .nav-count, .refresh-btn-label, .last-updated { display: none; }
+    .page-header, .stats-row, .table-section, .hero, .status-legend, .pricing-grid, .pricing-save-bar { padding-left: 20px; padding-right: 20px; }
   }
 </style>
 </head>
 <body>
 <div class="app">
+  <!-- ── SIDEBAR ── -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
-      <div class="suite">V<span style="color:var(--text2)">E</span></div>
-      <div class="sub">Earnings Tracker</div>
+      <div class="sidebar-logo-text">
+        <div class="suite">V<span style="color:var(--text2)">E</span></div>
+        <div class="sub">Earnings Tracker</div>
+      </div>
+      <button class="sidebar-toggle" id="sidebar-toggle" onclick="toggleSidebar()" title="Toggle sidebar">&#9776;</button>
     </div>
+
     <div class="sidebar-section">Overview</div>
     <div class="nav-item active" id="nav-home" onclick="switchTab('home')">
       <div class="dot" style="background:var(--gold)"></div>
-      <span>Dashboard</span>
+      <span class="nav-item-label">Dashboard</span>
     </div>
+    <div class="nav-item" id="nav-pricing" onclick="switchTab('pricing')">
+      <div class="dot" style="background:var(--gold-dim)"></div>
+      <span class="nav-item-label">Pricing Manager</span>
+    </div>
+
     <div class="sidebar-section">Clients</div>
     <div id="client-nav"></div>
+
     <div class="sidebar-bottom">
       <button class="refresh-btn" onclick="loadData()">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-        Refresh data
+        <span class="refresh-btn-label">Refresh data</span>
       </button>
       <div class="last-updated" id="last-updated">–</div>
     </div>
   </aside>
 
+  <!-- ── MAIN ── -->
   <main class="main" id="main-content">
     <div id="page-home"></div>
-    <div id="page-client" style="display:none"></div>
+    <div id="page-client"  style="display:none"></div>
     <div id="page-summary" style="display:none"></div>
+    <div id="page-pricing" style="display:none"></div>
   </main>
 </div>
 
 <script>
-// ── RATES ──────────────────────────────────────────────────────────────────
-const DEFAULT_RATE = 500;
-const BULLION_RATE = 400;
-
-// ── FULL NAME MAPPINGS ─────────────────────────────────────────────────────
-const FULL_NAMES = {
-  'neil': 'Neil Pangilinan',
-  'aus': 'Austin Garcia'
+// ═══════════════════════════════════════════════════════════════════════════
+// RATES — loaded from localStorage; hardcoded defaults are fallbacks ONLY
+// ═══════════════════════════════════════════════════════════════════════════
+const RATE_DEFAULTS = {
+  'LHF': 500, 'Boney': 500, 'L&S': 500, 'Jeya': 500,
+  'AM Market': 500, 'BullionFX': 400, 'Goreng Story': 500
 };
 
-function getFullName(shortName) {
-  const normalized = (shortName || '').toLowerCase().trim();
-  return FULL_NAMES[normalized] || shortName || 'Unknown';
+let clientRates = {};
+
+function loadRates() {
+  try {
+    const saved = localStorage.getItem('clientRates');
+    clientRates = saved ? JSON.parse(saved) : { ...RATE_DEFAULTS };
+    // Fill in any missing clients with defaults
+    for (const [k, v] of Object.entries(RATE_DEFAULTS)) {
+      if (clientRates[k] === undefined) clientRates[k] = v;
+    }
+  } catch (e) {
+    clientRates = { ...RATE_DEFAULTS };
+  }
+}
+
+function saveRates() {
+  localStorage.setItem('clientRates', JSON.stringify(clientRates));
 }
 
 function getRate(clientName) {
-  return clientName === "BullionFX" ? BULLION_RATE : DEFAULT_RATE;
+  return clientRates[clientName] !== undefined ? clientRates[clientName] : 500;
 }
 
-// ── CLIENT DEFINITIONS ────────────────────────────────────────────────────
-const CLIENTS = [
-  {
-    name: "LHF",
-    sheet: "1xU1qVfUaCwj5cVlvdY-SKnU4Cw2MqgV2mDA-OlgQgX0",
-    gid: "0",
-    cols: { date:0, editor:1, project:2, frame:3, revised:5, status:6 }
-  },
-  {
-    name: "Boney",
-    sheet: "1xU1qVfUaCwj5cVlvdY-SKnU4Cw2MqgV2mDA-OlgQgX0",
-    gid: "833188498",
-    cols: { date:0, editor:1, project:2, frame:4, revised:6, status:7 }
-  },
-  {
-    name: "L&S",
-    sheet: "1xU1qVfUaCwj5cVlvdY-SKnU4Cw2MqgV2mDA-OlgQgX0",
-    gid: "317078901",
-    cols: { date:0, editor:1, project:2, frame:3, revised:5, status:6 }
-  },
-  {
-    name: "Jeya",
-    sheet: "1xU1qVfUaCwj5cVlvdY-SKnU4Cw2MqgV2mDA-OlgQgX0",
-    gid: "1909088031",
-    cols: { date:0, editor:1, project:2, frame:4, revised:6, status:7 }
-  },
-  {
-    name: "AM Market",
-    sheet: "1xU1qVfUaCwj5cVlvdY-SKnU4Cw2MqgV2mDA-OlgQgX0",
-    gid: "1001571984",
-    cols: { date:0, editor:1, project:2, frame:4, revised:6, status:7 }
-  },
-  {
-    name: "BullionFX",
-    sheet: "1xU1qVfUaCwj5cVlvdY-SKnU4Cw2MqgV2mDA-OlgQgX0",
-    gid: "1467316596",
-    cols: { date:0, editor:1, project:2, frame:4, revised:6, status:7 }
-  },
-  {
-    name: "Goreng Story",
-    sheet: "1xU1qVfUaCwj5cVlvdY-SKnU4Cw2MqgV2mDA-OlgQgX0",
-    gid: "210567726",
-    cols: { date:0, editor:1, project:2, frame:4, revised:6, status:7 }
+// ═══════════════════════════════════════════════════════════════════════════
+// PER-PROJECT PRICE OVERRIDES
+// Key format: "ClientName||ProjectName"
+// ═══════════════════════════════════════════════════════════════════════════
+let projectOverrides = {};
+
+function loadProjectOverrides() {
+  try {
+    const saved = localStorage.getItem('projectOverrides');
+    projectOverrides = saved ? JSON.parse(saved) : {};
+  } catch(e) { projectOverrides = {}; }
+}
+
+function saveProjectOverrides() {
+  localStorage.setItem('projectOverrides', JSON.stringify(projectOverrides));
+}
+
+function getProjectKey(clientName, projectName) {
+  return clientName + '||' + projectName;
+}
+
+function getProjectRate(clientName, projectName) {
+  const key = getProjectKey(clientName, projectName);
+  return projectOverrides[key] !== undefined ? projectOverrides[key] : getRate(clientName);
+}
+
+function setProjectRate(clientName, projectName, value) {
+  const key = getProjectKey(clientName, projectName);
+  projectOverrides[key] = value;
+  saveProjectOverrides();
+}
+
+function resetProjectRate(clientName, projectName) {
+  const key = getProjectKey(clientName, projectName);
+  delete projectOverrides[key];
+  saveProjectOverrides();
+}
+
+function hasProjectOverride(clientName, projectName) {
+  return projectOverrides[getProjectKey(clientName, projectName)] !== undefined;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SIDEBAR COLLAPSE STATE
+// ═══════════════════════════════════════════════════════════════════════════
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  const collapsed = sb.classList.toggle('collapsed');
+  localStorage.setItem('sidebarCollapsed', collapsed ? 'true' : 'false');
+}
+
+function applySidebarState() {
+  const saved = localStorage.getItem('sidebarCollapsed');
+  if (saved === 'true') {
+    document.getElementById('sidebar').classList.add('collapsed');
   }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FULL NAME MAPPINGS
+// ═══════════════════════════════════════════════════════════════════════════
+const FULL_NAMES = { 'neil': 'Neil Pangilinan', 'aus': 'Austin Garcia' };
+
+function getFullName(shortName) {
+  const n = (shortName || '').toLowerCase().trim();
+  return FULL_NAMES[n] || shortName || 'Unknown';
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CLIENT DEFINITIONS
+// ═══════════════════════════════════════════════════════════════════════════
+const CLIENTS = [
+  { name:"LHF",          sheet:"1xU1qVfUaCwj5cVlvdY-SKnU4Cw2MqgV2mDA-OlgQgX0", gid:"0",          cols:{date:0,editor:1,project:2,frame:3,revised:5,status:6} },
+  { name:"Boney",        sheet:"1xU1qVfUaCwj5cVlvdY-SKnU4Cw2MqgV2mDA-OlgQgX0", gid:"833188498",  cols:{date:0,editor:1,project:2,frame:4,revised:6,status:7} },
+  { name:"L&S",          sheet:"1xU1qVfUaCwj5cVlvdY-SKnU4Cw2MqgV2mDA-OlgQgX0", gid:"317078901",  cols:{date:0,editor:1,project:2,frame:3,revised:5,status:6} },
+  { name:"Jeya",         sheet:"1xU1qVfUaCwj5cVlvdY-SKnU4Cw2MqgV2mDA-OlgQgX0", gid:"1909088031", cols:{date:0,editor:1,project:2,frame:4,revised:6,status:7} },
+  { name:"AM Market",    sheet:"1xU1qVfUaCwj5cVlvdY-SKnU4Cw2MqgV2mDA-OlgQgX0", gid:"1001571984", cols:{date:0,editor:1,project:2,frame:4,revised:6,status:7} },
+  { name:"BullionFX",    sheet:"1xU1qVfUaCwj5cVlvdY-SKnU4Cw2MqgV2mDA-OlgQgX0", gid:"1467316596", cols:{date:0,editor:1,project:2,frame:4,revised:6,status:7} },
+  { name:"Goreng Story", sheet:"1xU1qVfUaCwj5cVlvdY-SKnU4Cw2MqgV2mDA-OlgQgX0", gid:"210567726",  cols:{date:0,editor:1,project:2,frame:4,revised:6,status:7} }
 ];
 
-let allData = {};
-let activeTab = 'home';
+let allData    = {};
+let activeTab  = 'home';
 let activeEditor = 'all';
 
-// ── STATUS LOGIC ──────────────────────────────────────────────────────────
-// CHANGE 4 & 5: Rebuilt status logic using ONLY frame and revised columns.
-// Priority order: revised first, then frame, then pending.
-// A row with a revised link is ALWAYS exported — regardless of frame state.
-// Previously the code checked `st.includes('paid')` etc. from a status text
-// column, which caused rows with revised links to sometimes fall through to
-// 'checking' if the status column didn't match. Now we ignore the status
-// column entirely for workflow state.
-function getProjectStatus(row) {
+// ═══════════════════════════════════════════════════════════════════════════
+// STATUS SYSTEMS — TWO SEPARATE FUNCTIONS
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * WORKFLOW STATUS — derived exclusively from frame/revised columns.
+ * Returns: 'exported' | 'checking' | 'pending' | null (empty row)
+ * Never touches the payment/status column.
+ */
+function getWorkflowStatus(row) {
   const hasRevised = !!(row.revised && row.revised.trim());
   const hasFrame   = !!(row.frame   && row.frame.trim());
   const hasProject = !!(row.project && row.project.trim());
 
-  // Must have a project name to count at all
-  if (!hasProject) return null;
-
-  if (hasRevised)          return 'exported';  // revised present → always exported
-  if (hasFrame)            return 'checking';  // frame only → for checking
-  return 'pending';                            // nothing → pending
+  if (!hasProject) return null;         // empty row — ignore entirely
+  if (hasRevised)  return 'exported';   // revised exists → exported (regardless of frame)
+  if (hasFrame)    return 'checking';   // frame only → for checking
+  return 'pending';                     // neither → pending
 }
 
-// ── CSV HELPERS ───────────────────────────────────────────────────────────
+/**
+ * PAYMENT STATUS — derived exclusively from the spreadsheet status column.
+ * Returns: 'paid' | 'unpaid' | null (no payment info)
+ * Never touches frame or revised.
+ */
+function getPaymentStatus(row) {
+  const st = (row.status || '').toLowerCase().trim();
+  if (!st) return null;
+  if (st.includes('paid') && !st.includes('not') && !st.includes('un')) return 'paid';
+  if (st.includes('not paid') || st.includes('unpaid')) return 'unpaid';
+  return null;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CSV HELPERS
+// ═══════════════════════════════════════════════════════════════════════════
 function splitCSVLine(line) {
   const result = []; let cur = '', inQ = false;
   for (let i = 0; i < line.length; i++) {
@@ -355,7 +489,7 @@ function parseCSV(text, clientDef) {
   const rows = [];
 
   for (let i = 1; i < lines.length; i++) {
-    const c = splitCSVLine(lines[i]);
+    const c       = splitCSVLine(lines[i]);
     const date    = (c[cols.date]    || '').trim();
     const editor  = (c[cols.editor]  || '').trim();
     const project = (c[cols.project] || '').trim();
@@ -363,13 +497,10 @@ function parseCSV(text, clientDef) {
     const revised = (c[cols.revised] || '').trim();
     const status  = (c[cols.status]  || '').trim();
 
-    // CHANGE 3: Exclude rows where editor name contains 'val' (case-insensitive).
-    // This covers Val, VAL, val, Valerie, etc.
-    // These rows are excluded BEFORE any counting, so they never appear
-    // in totals, tables, summaries, or editor statistics.
+    // Exclude Val editors entirely — before any counting
     if (editor.toLowerCase().includes('val')) continue;
 
-    // Skip rows with no date AND no project (truly empty rows)
+    // Skip completely empty rows
     if (!date && !project) continue;
 
     rows.push({ date, editor, project, frame, revised, status });
@@ -401,7 +532,9 @@ async function loadData() {
   }
 }
 
-// ── FILTERING & AGGREGATION ───────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+// FILTERING & AGGREGATION
+// ═══════════════════════════════════════════════════════════════════════════
 function filterByEditor(rows) {
   if (!rows) return [];
   if (activeEditor === 'all') return rows;
@@ -409,23 +542,29 @@ function filterByEditor(rows) {
 }
 
 function computeClientStats(rows, clientName) {
-  const f = filterByEditor(rows);
-  // NOTE: paid/unpaid are no longer derived from getProjectStatus (which is
-  // now frame/revised-only). We keep them as zero here since the new status
-  // logic has no paid/unpaid states — those were driven by the old status
-  // column. If paid/unpaid tracking is needed in the future it should come
-  // from a dedicated payment column, not mixed into workflow status.
+  const f    = filterByEditor(rows);
   const tally = { paid:0, unpaid:0, exported:0, checking:0, pending:0 };
-  const rate = getRate(clientName);
+  let earnings = 0, pendingAmount = 0;
+
   for (const r of f) {
-    const s = getProjectStatus(r);
-    if (s) tally[s] = (tally[s] || 0) + 1;
+    const ws = getWorkflowStatus(r);
+    const ps = getPaymentStatus(r);
+    const rate = getProjectRate(clientName, r.project);
+    if (ws) tally[ws]++;
+    if (ps) tally[ps]++;
+    if (ps === 'paid')   earnings      += rate;
+    if (ps === 'unpaid') pendingAmount += rate;
   }
+
   return {
-    total: f.filter(r => getProjectStatus(r) !== null).length,
-    ...tally,
-    earnings:      tally.paid   * rate,
-    pendingAmount: tally.unpaid * rate,
+    total:         f.filter(r => getWorkflowStatus(r) !== null).length,
+    paid:          tally.paid,
+    unpaid:        tally.unpaid,
+    exported:      tally.exported,
+    checking:      tally.checking,
+    pending:       tally.pending,
+    earnings,
+    pendingAmount,
   };
 }
 
@@ -435,17 +574,19 @@ function computeGlobal() {
   let total = 0;
 
   for (const [clientName, rows] of Object.entries(allData)) {
-    const rate = getRate(clientName);
     for (const r of filterByEditor(rows)) {
-      const s = getProjectStatus(r);
-      if (!s) continue;  // skip rows with no project name
+      const ws   = getWorkflowStatus(r);
+      const ps   = getPaymentStatus(r);
+      const rate = getProjectRate(clientName, r.project);
+      if (!ws) continue;
       total++;
-      tally[s] = (tally[s] || 0) + 1;
-
+      tally[ws]++;
+      if (ps) tally[ps]++;
       const ed = r.editor || 'Unknown';
       if (!editorMap[ed]) editorMap[ed] = { paid:0, unpaid:0, exported:0, checking:0, pending:0, earnings:0 };
-      editorMap[ed][s]++;
-      if (s === 'paid') editorMap[ed].earnings += rate;
+      editorMap[ed][ws]++;
+      if (ps) editorMap[ed][ps]++;
+      if (ps === 'paid') editorMap[ed].earnings += rate;
     }
   }
 
@@ -453,20 +594,21 @@ function computeGlobal() {
 }
 
 function getGlobalEarningsBreakdown() {
-  let paidSum = 0;
-  let unpaidSum = 0;
+  let paidSum = 0, unpaidSum = 0;
   for (const [clientName, rows] of Object.entries(allData)) {
-    const rate = getRate(clientName);
     for (const r of filterByEditor(rows)) {
-      const s = getProjectStatus(r);
-      if (s === 'paid')   paidSum   += rate;
-      if (s === 'unpaid') unpaidSum += rate;
+      const ps   = getPaymentStatus(r);
+      const rate = getProjectRate(clientName, r.project);
+      if (ps === 'paid')   paidSum   += rate;
+      if (ps === 'unpaid') unpaidSum += rate;
     }
   }
   return { paidSum, unpaidSum };
 }
 
-// ── RENDER HELPERS ────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+// RENDER HELPERS
+// ═══════════════════════════════════════════════════════════════════════════
 function badgeHTML(status) {
   const map = {
     paid:     ['badge-paid',     '✓ Paid'],
@@ -484,14 +626,9 @@ function fmt(n) { return '₱' + n.toLocaleString(); }
 function getEditors() {
   const s = new Set();
   for (const rows of Object.values(allData)) {
-    // CHANGE 3: Val is already excluded at parse time, but double-guard here
-    // to ensure no val-named editor ever appears in the filter buttons.
     rows.forEach(r => {
-      if (r.editor && r.editor.trim()
-          && r.editor.toLowerCase() !== 'val'
-          && !r.editor.toLowerCase().includes('val')) {
+      if (r.editor && r.editor.trim() && !r.editor.toLowerCase().includes('val'))
         s.add(r.editor);
-      }
     });
   }
   return [...s].sort();
@@ -518,70 +655,132 @@ function editorTagHTML(editor) {
   return `<span class="editor-tag ${cls}" title="${fullName}">${editor || '–'}</span>`;
 }
 
-function amountCellHTML(status, clientName) {
-  const rate = getRate(clientName);
-  if (status === 'paid')   return `<span class="amount earned">${fmt(rate)}</span>`;
-  if (status === 'unpaid') return `<span class="amount owed">${fmt(rate)}</span>`;
-  return `<span style="color:var(--muted)">–</span>`;
+/**
+ * VIDEO COLUMN — shows "Exported" if revised has any value, dash otherwise.
+ * No links, no URL validation, no href.
+ */
+function videoColHTML(row) {
+  const hasRevised = !!(row.revised && row.revised.trim());
+  if (hasRevised) return `<span class="badge badge-exported">Exported</span>`;
+  return `<span style="color:var(--muted)">—</span>`;
 }
 
-// CHANGE 1 & 2: Video link helper.
-// Always uses row.revised ONLY — never falls back to row.frame.
-// Label changed from "View Resource" → "View Video".
-function videoLinkHTML(row) {
-  const targetLink = (row.revised || '').trim();
-  const hasValidLink = targetLink.startsWith('http://') || targetLink.startsWith('https://');
-  if (hasValidLink) {
-    return `<a class="resource-link" href="${targetLink}" target="_blank" rel="noopener noreferrer">↗ View Video</a>`;
+function amountCellHTML(paymentStatus, clientName, projectName) {
+  if (paymentStatus !== 'paid' && paymentStatus !== 'unpaid') {
+    return `<span style="color:var(--muted)">–</span>`;
   }
-  return `<span class="resource-none">No link attached</span>`;
+  const rate       = getProjectRate(clientName, projectName);
+  const overridden = hasProjectOverride(clientName, projectName);
+  const cls        = paymentStatus === 'paid' ? 'earned' : 'owed';
+  const safeClient  = encodeURIComponent(clientName);
+  const safeProject = encodeURIComponent(projectName);
+  const resetBtn   = overridden
+    ? `<button class="reset-price-btn" title="Reset to client default (${fmt(getRate(clientName))})"
+         onclick="event.stopPropagation();doResetProjectRate('${safeClient}','${safeProject}')">↺</button>`
+    : '';
+  return `<span class="amount-cell" data-overridden="${overridden}"
+      data-client="${safeClient}" data-project="${safeProject}"
+      ondblclick="startInlineEdit(this)"
+      title="Double-click to set a custom price for this project">
+    <span class="amount ${cls}">${fmt(rate)}</span>
+    <span class="edit-pencil">✎</span>
+    ${resetBtn}
+  </span>`;
 }
 
-// ── RENDER PIPELINE ────────────────────────────────────────────────────────
+function startInlineEdit(cell) {
+  if (cell.querySelector('.amount-inline-input')) return;
+  const clientName  = decodeURIComponent(cell.getAttribute('data-client'));
+  const projectName = decodeURIComponent(cell.getAttribute('data-project'));
+  const current     = getProjectRate(clientName, projectName);
+  const amountSpan  = cell.querySelector('.amount');
+  amountSpan.style.display = 'none';
+  const pencil = cell.querySelector('.edit-pencil');
+  if (pencil) pencil.style.display = 'none';
+  const input = document.createElement('input');
+  input.type  = 'number';
+  input.min   = '0';
+  input.value = current;
+  input.className = 'amount-inline-input';
+  cell.insertBefore(input, amountSpan);
+  input.focus();
+  input.select();
+  let committed = false;
+  function commit() {
+    if (committed) return;
+    committed = true;
+    const val = parseInt(input.value, 10);
+    if (!isNaN(val) && val >= 0) setProjectRate(clientName, projectName, val);
+    renderAll();
+  }
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter')  { e.preventDefault(); commit(); }
+    if (e.key === 'Escape') { committed = true; renderAll(); }
+  });
+  input.addEventListener('blur', commit);
+}
+
+function doResetProjectRate(safeClient, safeProject) {
+  resetProjectRate(decodeURIComponent(safeClient), decodeURIComponent(safeProject));
+  renderAll();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RENDER PIPELINE
+// ═══════════════════════════════════════════════════════════════════════════
 function setEditor(name) { activeEditor = name; renderAll(); }
-function switchTab(tab) { activeTab = tab; renderAll(); window.scrollTo(0,0); }
+
+function switchTab(tab) {
+  activeTab = tab;
+  renderAll();
+  window.scrollTo(0, 0);
+}
 
 function renderAll() {
   renderSidebar();
-  if      (activeTab === 'home')            renderHome();
-  else if (activeTab === 'summary-pending') renderSummaryPage('pending');
-  else if (activeTab === 'summary-checking')renderSummaryPage('checking');
-  else if (activeTab === 'summary-unpaid')  renderSummaryPage('unpaid');
-  else                                      renderClient(activeTab);
+  if      (activeTab === 'home')             renderHome();
+  else if (activeTab === 'pricing')          renderPricing();
+  else if (activeTab === 'summary-pending')  renderSummaryPage('pending');
+  else if (activeTab === 'summary-checking') renderSummaryPage('checking');
+  else if (activeTab === 'summary-unpaid')   renderSummaryPage('unpaid');
+  else                                       renderClient(activeTab);
 }
 
 function renderSidebar() {
-  const nav = document.getElementById('client-nav');
+  const nav    = document.getElementById('client-nav');
   const colors = ['#60a5fa','#f472b6','#34d399','#a78bfa','#fb923c','#e879f9','#f9a8d4'];
 
-  document.getElementById('nav-home').className = activeTab === 'home' ? 'nav-item active' : 'nav-item';
+  document.getElementById('nav-home').className    = activeTab === 'home'    ? 'nav-item active' : 'nav-item';
+  document.getElementById('nav-pricing').className = activeTab === 'pricing' ? 'nav-item active' : 'nav-item';
 
   nav.innerHTML = Object.keys(allData).map((c, i) => {
-    const count = filterByEditor(allData[c]).filter(r => getProjectStatus(r) !== null).length;
+    const count  = filterByEditor(allData[c]).filter(r => getWorkflowStatus(r) !== null).length;
     const active = activeTab === c ? 'active' : '';
     return `<div class="nav-item ${active}" onclick="switchTab('${c}')">
       <div class="dot" style="background:${colors[i % colors.length]}"></div>
-      <span>${c}</span>
+      <span class="nav-item-label">${c}</span>
       <span class="nav-count">${count}</span>
     </div>`;
   }).join('');
 }
 
+// ── HOME / DASHBOARD ──────────────────────────────────────────────────────
 function renderHome() {
-  document.getElementById('page-client').style.display = 'none';
+  document.getElementById('page-client').style.display  = 'none';
   document.getElementById('page-summary').style.display = 'none';
+  document.getElementById('page-pricing').style.display = 'none';
   const el = document.getElementById('page-home');
   el.style.display = '';
 
-  const g = computeGlobal();
+  const g         = computeGlobal();
   const financial = getGlobalEarningsBreakdown();
-  const editors = getEditors();
+  const editors   = getEditors();
 
   const editorCards = editors
     .filter(ed => activeEditor === 'all' || activeEditor === ed)
     .map(ed => {
-      const info = g.editorMap[ed] || {};
-      const full = getFullName(ed);
+      const info       = g.editorMap[ed] || {};
+      const full       = getFullName(ed);
       const inProgress = (info.exported||0) + (info.checking||0) + (info.pending||0);
       return `<div class="editor-card">
         <div class="editor-card-name">${ed}</div>
@@ -646,38 +845,40 @@ function renderHome() {
       <span class="legend-label">Status key:</span>
       <span class="legend-item"><span class="legend-dot" style="background:#22c55e"></span>Paid</span>
       <span class="legend-item"><span class="legend-dot" style="background:#ef4444"></span>Not Paid</span>
-      <span class="legend-item"><span class="legend-dot" style="background:#2dd4bf"></span>Exported — revised video link attached</span>
-      <span class="legend-item"><span class="legend-dot" style="background:#fbbf24"></span>For Checking — frame link active, awaiting revised link</span>
-      <span class="legend-item"><span class="legend-dot" style="background:#a78bfa"></span>Pending — frame link empty / not started</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#2dd4bf"></span>Exported — revised file exists</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#fbbf24"></span>For Checking — frame active, no revised</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#a78bfa"></span>Pending — not started</span>
     </div>
   `;
 
   countUp('count-num',    financial.paidSum, 1200);
-  countUp('count-paid',   g.paid,      900);
-  countUp('count-unpaid', g.unpaid,    900);
+  countUp('count-paid',   g.paid,            900);
+  countUp('count-unpaid', g.unpaid,          900);
 }
 
+// ── CLIENT PAGE ───────────────────────────────────────────────────────────
 function renderClient(clientName) {
-  document.getElementById('page-home').style.display = 'none';
+  document.getElementById('page-home').style.display    = 'none';
   document.getElementById('page-summary').style.display = 'none';
+  document.getElementById('page-pricing').style.display = 'none';
   const el = document.getElementById('page-client');
   el.style.display = '';
 
-  const rows = allData[clientName] || [];
-  const filtered = filterByEditor(rows).filter(r => getProjectStatus(r) !== null);
-  const s = computeClientStats(rows, clientName);
-  const rate = getRate(clientName);
+  const rows     = allData[clientName] || [];
+  const filtered = filterByEditor(rows).filter(r => getWorkflowStatus(r) !== null);
+  const s        = computeClientStats(rows, clientName);
+  const rate     = getRate(clientName);
 
-  // CHANGE 1: Table header "Asset Link" → "Video"
   const tableRows = filtered.map(r => {
-    const ps = getProjectStatus(r);
+    const ws = getWorkflowStatus(r);
+    const ps = getPaymentStatus(r);
     return `<tr>
       <td><span style="color:var(--muted);font-size:12px">${r.date || '–'}</span></td>
       <td class="project-name">${r.project || '–'}</td>
       <td>${editorTagHTML(r.editor)}</td>
-      <td>${badgeHTML(ps)}</td>
-      <td>${videoLinkHTML(r)}</td>
-      <td>${amountCellHTML(ps, clientName)}</td>
+      <td>${badgeHTML(ws)}${ps ? ' ' + badgeHTML(ps) : ''}</td>
+      <td>${videoColHTML(r)}</td>
+      <td>${amountCellHTML(ps, clientName, r.project)}</td>
     </tr>`;
   }).join('');
 
@@ -694,7 +895,7 @@ function renderClient(clientName) {
       <div class="stat-card earnings">
         <div class="stat-label">Earnings</div>
         <div class="stat-value">${fmt(s.earnings)}</div>
-        <div class="stat-sub">${s.paid} paid videos · ${fmt(rate)}/ea</div>
+        <div class="stat-sub">${s.paid} paid · ${fmt(getRate(clientName))}/ea default</div>
       </div>
       <div class="stat-card unpaid clickable" onclick="switchTab('summary-unpaid')">
         <div class="stat-label">Pending Payment</div>
@@ -733,56 +934,57 @@ function renderClient(clientName) {
   `;
 }
 
-// ── SUMMARY PAGES (Pending / Checking / Unpaid) ───────────────────────────
+// ── SUMMARY PAGES ─────────────────────────────────────────────────────────
 function renderSummaryPage(type) {
-  document.getElementById('page-home').style.display = 'none';
-  document.getElementById('page-client').style.display = 'none';
+  document.getElementById('page-home').style.display    = 'none';
+  document.getElementById('page-client').style.display  = 'none';
+  document.getElementById('page-pricing').style.display = 'none';
   const el = document.getElementById('page-summary');
   el.style.display = '';
 
-  const titleMap = {
-    pending:  'Pending Workspace',
-    checking: 'For Checking Summary',
-    unpaid:   'Unpaid Summary',
-  };
+  const titleMap = { pending:'Pending Workspace', checking:'For Checking Summary', unpaid:'Unpaid Summary' };
 
+  // workflow types use getWorkflowStatus; 'unpaid' uses getPaymentStatus
+  const isPaymentType = (type === 'unpaid');
   const matches = [];
   let aggregateOwedSum = 0;
 
   for (const [clientName, rows] of Object.entries(allData)) {
-    const rate = getRate(clientName);
     for (const r of filterByEditor(rows)) {
-      if (getProjectStatus(r) === type) {
+      const match = isPaymentType
+        ? getPaymentStatus(r) === 'unpaid'
+        : getWorkflowStatus(r) === type;
+      if (match) {
         matches.push({ client: clientName, r });
-        if (type === 'unpaid') aggregateOwedSum += rate;
+        if (isPaymentType) aggregateOwedSum += getProjectRate(clientName, r.project);
       }
     }
   }
 
-  const unpaidTotalMarkup = type === 'unpaid'
+  const unpaidTotalMarkup = isPaymentType
     ? `<div style="margin:0 40px 0;padding:16px 20px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:10px;display:flex;justify-content:space-between;align-items:center">
         <span style="font-size:13px;color:var(--text2)">${matches.length} unpaid video${matches.length !== 1 ? 's' : ''} · Global Accumulation Owed</span>
         <span style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--red)">${fmt(aggregateOwedSum)}</span>
        </div>`
     : '';
 
-  // CHANGE 1: Column header "Resource Asset" → "Video Link"
-  // CHANGE 2: Link always comes from row.revised via videoLinkHTML()
   const tableRows = matches.map(({ client, r }) => {
-    const rate = getRate(client);
+    const rate = getProjectRate(client, r.project);
+    const ws   = getWorkflowStatus(r);
+    const ps   = getPaymentStatus(r);
     return `<tr>
       <td><span style="font-weight:600;color:var(--gold)">${client}</span></td>
       <td><span style="color:var(--muted);font-size:12px">${r.date || '–'}</span></td>
       <td class="project-name">${r.project || '–'}</td>
       <td>${editorTagHTML(r.editor)}</td>
       <td>${badgeHTML(type)}</td>
-      <td>${videoLinkHTML(r)}</td>
-      ${type === 'unpaid' ? `<td><span class="amount owed">${fmt(rate)}</span></td>` : ''}
+      <td>${videoColHTML(r)}</td>
+      ${isPaymentType ? `<td>${amountCellHTML(ps, client, r.project)}</td>` : ''}
     </tr>`;
   }).join('');
 
-  const extraCol = type === 'unpaid' ? '<th>Amount</th>' : '';
-  const colSpan  = type === 'unpaid' ? 7 : 6;
+  const extraCol = isPaymentType ? '<th>Amount</th>' : '';
+  const colSpan  = isPaymentType ? 7 : 6;
 
   el.innerHTML = `
     <div class="page-header">
@@ -802,7 +1004,7 @@ function renderSummaryPage(type) {
       </div>
       <table>
         <thead>
-          <tr><th>Client</th><th>Date</th><th>Project</th><th>Editor</th><th>Status</th><th>Video Link</th>${extraCol}</tr>
+          <tr><th>Client</th><th>Date</th><th>Project</th><th>Editor</th><th>Status</th><th>Video</th>${extraCol}</tr>
         </thead>
         <tbody>
           ${tableRows || `<tr><td colspan="${colSpan}" style="text-align:center;color:var(--muted);padding:48px">No items found for this status.</td></tr>`}
@@ -812,13 +1014,108 @@ function renderSummaryPage(type) {
   `;
 }
 
+// ── PRICING MANAGER ───────────────────────────────────────────────────────
+function renderPricing() {
+  document.getElementById('page-home').style.display    = 'none';
+  document.getElementById('page-client').style.display  = 'none';
+  document.getElementById('page-summary').style.display = 'none';
+  const el = document.getElementById('page-pricing');
+  el.style.display = '';
+
+  const cards = Object.keys(RATE_DEFAULTS).map(clientName => {
+    const current = getRate(clientName);
+    return `<div class="pricing-card">
+      <div class="pricing-client">${clientName}</div>
+      <div class="pricing-input-row">
+        <span class="pricing-symbol">₱</span>
+        <input
+          class="pricing-input"
+          type="number"
+          min="0"
+          id="rate-${clientName.replace(/[^a-z0-9]/gi,'_')}"
+          value="${current}"
+          data-client="${clientName}"
+          onchange="onRateChange(this)"
+        />
+      </div>
+      <div class="pricing-hint">per video · editable</div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="page-header">
+      <div>
+        <div class="page-title">Settings</div>
+        <div class="client-name">PRICING <span>MANAGER</span></div>
+      </div>
+    </div>
+
+    <div class="pricing-grid">${cards}</div>
+
+    <div class="pricing-save-bar">
+      <button class="pricing-save-btn" onclick="savePricingFromUI()">Save Rates</button>
+      <span class="pricing-saved-msg" id="pricing-saved-msg">✓ Rates saved</span>
+      <button class="pricing-reset-btn" onclick="resetRates()">Reset to Defaults</button>
+    </div>
+
+    <div style="padding: 0 40px 40px">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 24px;max-width:560px">
+        <div style="font-size:11px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:10px">How rates work</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.7">
+          Rates are saved to your browser and persist across refreshes. Every earnings total,
+          dashboard card, and client page uses the rate stored here. Changing a rate and saving
+          instantly recalculates everything on reload.
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function onRateChange(input) {
+  // Live update in-memory so totals reflect immediately if user navigates away
+  const client = input.getAttribute('data-client');
+  const val    = parseInt(input.value, 10);
+  if (!isNaN(val) && val >= 0) clientRates[client] = val;
+}
+
+function savePricingFromUI() {
+  // Read all inputs and save
+  for (const clientName of Object.keys(RATE_DEFAULTS)) {
+    const id  = 'rate-' + clientName.replace(/[^a-z0-9]/gi, '_');
+    const inp = document.getElementById(id);
+    if (inp) {
+      const val = parseInt(inp.value, 10);
+      if (!isNaN(val) && val >= 0) clientRates[clientName] = val;
+    }
+  }
+  saveRates();
+
+  // Flash confirmation
+  const msg = document.getElementById('pricing-saved-msg');
+  if (msg) {
+    msg.classList.add('show');
+    setTimeout(() => msg.classList.remove('show'), 2500);
+  }
+
+  // Re-render everything so all counts/earnings update with new rates
+  renderAll();
+}
+
+function resetRates() {
+  if (!confirm('Reset all rates to their original defaults?')) return;
+  clientRates = { ...RATE_DEFAULTS };
+  saveRates();
+  renderPricing();
+  renderSidebar();
+}
+
 // ── COUNTER ANIMATION ─────────────────────────────────────────────────────
 function countUp(id, target, duration) {
   const el = document.getElementById(id);
   if (!el) return;
   const start = performance.now();
   function step(now) {
-    const p = Math.min((now - start) / duration, 1);
+    const p    = Math.min((now - start) / duration, 1);
     const ease = 1 - Math.pow(1 - p, 3);
     el.textContent = Math.round(ease * target).toLocaleString();
     if (p < 1) requestAnimationFrame(step);
@@ -827,6 +1124,9 @@ function countUp(id, target, duration) {
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────
+loadRates();
+loadProjectOverrides();
+applySidebarState();
 loadData();
 </script>
 </body>
