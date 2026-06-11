@@ -214,7 +214,6 @@
   .amount-inline-input::-webkit-inner-spin-button,
   .amount-inline-input::-webkit-outer-spin-button { -webkit-appearance: none; }
 
-
   /* ── PRICING MANAGER ── */
   .pricing-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; padding: 28px 40px 40px; }
   .pricing-card {
@@ -261,55 +260,451 @@
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
-@media (max-width: 700px) {
-  .sidebar { width: 56px; }
-  .sidebar-logo-text, .nav-item-label, .sidebar-section, .nav-count, .refresh-btn-label, .last-updated { display: none; }
-  .page-header, .stats-row, .table-section, .hero, .status-legend, .pricing-grid, .pricing-save-bar { padding-left: 16px; padding-right: 16px; }
-  .page-header { flex-direction: column; align-items: flex-start; gap: 16px; }
-  .client-name { font-size: 32px; }
-  .hero { padding-top: 32px; }
-  .hero-earnings { font-size: clamp(56px, 18vw, 90px); }
-  .hero-breakdown { gap: 16px; justify-content: center; }
-  .hero-divider { display: none; }
-  .hero-stat { min-width: 90px; }
-  .hero-stat-val { font-size: 24px; }
-  .stats-row { gap: 12px; }
-  .stat-card { min-width: 100%; padding: 18px; }
-  .stat-value { font-size: 30px; }
-  .stat-card.earnings .stat-value { font-size: 36px; }
-  .editor-earnings { gap: 12px; }
-  .editor-card { width: 100%; min-width: unset; padding: 16px; }
-  .editor-card-amt { font-size: 30px; }
-  .status-legend { gap: 10px; }
-  .legend-item { font-size: 11px; }
-  .pricing-grid { grid-template-columns: 1fr; gap: 12px; }
-  .pricing-save-bar { flex-direction: column; align-items: stretch; gap: 10px; }
-  .pricing-save-btn, .pricing-reset-btn { width: 100%; }
-  .pricing-reset-btn { margin-left: 0; }
-  .table-section { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  table { min-width: 700px; }
-  th, td { padding: 10px; white-space: nowrap; }
-  .amount-inline-input { width: 70px; }
-  .table-header { flex-direction: column; align-items: flex-start; gap: 6px; }
-  .pricing-input { font-size: 28px; }
-  .editor-filter { width: 100%; }
-  .editor-btn { font-size: 11px; padding: 6px 10px; }
-}
+  /* ═══════════════════════════════════════════════════════════════
+     DESKTOP LEGACY RESPONSIVE (unchanged — exactly as original)
+  ═══════════════════════════════════════════════════════════════ */
+  @media (max-width: 700px) {
+    .sidebar { width: 56px; }
+    .sidebar-logo-text, .nav-item-label, .sidebar-section, .nav-count, .refresh-btn-label, .last-updated { display: none; }
+    .page-header, .stats-row, .table-section, .hero, .status-legend, .pricing-grid, .pricing-save-bar { padding-left: 16px; padding-right: 16px; }
+    .page-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .client-name { font-size: 32px; }
+    .hero { padding-top: 32px; }
+    .hero-earnings { font-size: clamp(56px, 18vw, 90px); }
+    .hero-breakdown { gap: 16px; justify-content: center; }
+    .hero-divider { display: none; }
+    .hero-stat { min-width: 90px; }
+    .hero-stat-val { font-size: 24px; }
+    .stats-row { gap: 12px; }
+    .stat-card { min-width: 100%; padding: 18px; }
+    .stat-value { font-size: 30px; }
+    .stat-card.earnings .stat-value { font-size: 36px; }
+    .editor-earnings { gap: 12px; }
+    .editor-card { width: 100%; min-width: unset; padding: 16px; }
+    .editor-card-amt { font-size: 30px; }
+    .status-legend { gap: 10px; }
+    .legend-item { font-size: 11px; }
+    .pricing-grid { grid-template-columns: 1fr; gap: 12px; }
+    .pricing-save-bar { flex-direction: column; align-items: stretch; gap: 10px; }
+    .pricing-save-btn, .pricing-reset-btn { width: 100%; }
+    .pricing-reset-btn { margin-left: 0; }
+    .table-section { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table { min-width: 700px; }
+    th, td { padding: 10px; white-space: nowrap; }
+    .amount-inline-input { width: 70px; }
+    .table-header { flex-direction: column; align-items: flex-start; gap: 6px; }
+    .pricing-input { font-size: 28px; }
+    .editor-filter { width: 100%; }
+    .editor-btn { font-size: 11px; padding: 6px 10px; }
+  }
 
-@media (max-width: 480px) {
-  .client-name { font-size: 28px; }
-  .hero-earnings { font-size: clamp(48px, 16vw, 72px); }
-  .hero-stat-val { font-size: 20px; }
-  .stat-card.earnings .stat-value { font-size: 32px; }
-  .editor-card-amt { font-size: 26px; }
-  .pricing-input { font-size: 24px; }
-  .page-header, .stats-row, .table-section, .hero, .status-legend, .pricing-grid, .pricing-save-bar { padding-left: 12px; padding-right: 12px; }
-}
+  @media (max-width: 480px) {
+    .client-name { font-size: 28px; }
+    .hero-earnings { font-size: clamp(48px, 16vw, 72px); }
+    .hero-stat-val { font-size: 20px; }
+    .stat-card.earnings .stat-value { font-size: 32px; }
+    .editor-card-amt { font-size: 26px; }
+    .pricing-input { font-size: 24px; }
+    .page-header, .stats-row, .table-section, .hero, .status-legend, .pricing-grid, .pricing-save-bar { padding-left: 12px; padding-right: 12px; }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     MOBILE LAYOUT — activates at max-width: 768px
+     Desktop (.app, .sidebar, .main) is completely hidden on mobile.
+     A separate #mobile-root takes over.
+  ═══════════════════════════════════════════════════════════════ */
+
+  /* Hide mobile shell on desktop */
+  #mobile-root { display: none; }
+
+  @media (max-width: 768px) {
+    /* Hide entire desktop app */
+    .app { display: none !important; }
+
+    /* Show mobile shell */
+    #mobile-root { display: flex; flex-direction: column; min-height: 100vh; min-height: -webkit-fill-available; }
+
+    /* ── MOBILE TOP BAR ── */
+    .mob-topbar {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 12px;
+      padding: 0 16px; height: 56px; flex-shrink: 0;
+    }
+    .mob-hamburger {
+      width: 44px; height: 44px; display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 5px; background: none; border: none; cursor: pointer;
+      border-radius: 8px; flex-shrink: 0; transition: background 0.15s;
+    }
+    .mob-hamburger:active { background: var(--surface2); }
+    .mob-hamburger span {
+      display: block; width: 20px; height: 2px; background: var(--text2);
+      border-radius: 2px; transition: all 0.2s;
+    }
+    .mob-logo {
+      font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; color: var(--gold);
+      line-height: 1; flex-shrink: 0;
+    }
+    .mob-logo-dot { color: var(--text2); }
+    .mob-page-title {
+      flex: 1; font-size: 13px; font-weight: 600; color: var(--text2);
+      text-transform: uppercase; letter-spacing: 1px; overflow: hidden;
+      white-space: nowrap; text-overflow: ellipsis; text-align: right;
+    }
+    .mob-refresh-indicator {
+      width: 8px; height: 8px; border-radius: 50%; background: var(--muted);
+      flex-shrink: 0; transition: background 0.3s;
+    }
+    .mob-refresh-indicator.active { background: var(--gold); animation: pulse-dot 1s ease-in-out infinite; }
+    .mob-refresh-indicator.done   { background: var(--green); }
+    @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+    /* ── DRAWER OVERLAY ── */
+    .mob-drawer-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,0.6); opacity: 0; pointer-events: none;
+      transition: opacity 0.25s; backdrop-filter: blur(2px);
+    }
+    .mob-drawer-overlay.open { opacity: 1; pointer-events: all; }
+
+    /* ── DRAWER PANEL ── */
+    .mob-drawer {
+      position: fixed; top: 0; left: 0; bottom: 0; z-index: 201;
+      width: 280px; max-width: 85vw;
+      background: var(--surface); border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      transform: translateX(-100%); transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+      will-change: transform;
+    }
+    .mob-drawer.open { transform: translateX(0); }
+
+    .mob-drawer-header {
+      padding: 20px 20px 16px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+    }
+    .mob-drawer-logo { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 2px; color: var(--gold); }
+    .mob-drawer-logo-sub { font-size: 10px; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; margin-top: 2px; }
+    .mob-drawer-close {
+      width: 44px; height: 44px; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--muted); font-size: 18px; cursor: pointer; line-height: 44px; text-align: center;
+    }
+
+    .mob-drawer-section {
+      padding: 16px 20px 6px; font-size: 10px; letter-spacing: 2px;
+      color: var(--muted); text-transform: uppercase;
+    }
+    .mob-drawer-nav { flex: 1; overflow-y: auto; padding: 0 12px; }
+
+    .mob-nav-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 12px; border-radius: 10px; cursor: pointer;
+      font-size: 14px; font-weight: 500; color: var(--text2);
+      transition: all 0.15s; border: 1px solid transparent;
+      min-height: 52px; margin: 2px 0;
+    }
+    .mob-nav-item:active { background: var(--surface2); }
+    .mob-nav-item.active {
+      background: var(--gold-glow); color: var(--gold);
+      border-color: rgba(245,166,35,0.25);
+    }
+    .mob-nav-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .mob-nav-label { flex: 1; }
+    .mob-nav-count {
+      font-size: 12px; background: var(--surface2); padding: 2px 8px;
+      border-radius: 10px; color: var(--muted);
+    }
+    .mob-nav-item.active .mob-nav-count { background: rgba(245,166,35,0.2); color: var(--gold); }
+
+    .mob-drawer-bottom {
+      padding: 16px; border-top: 1px solid var(--border); flex-shrink: 0;
+      padding-bottom: calc(16px + env(safe-area-inset-bottom));
+    }
+    .mob-drawer-refresh {
+      width: 100%; padding: 14px; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 10px; color: var(--text2); font-size: 14px; font-weight: 500;
+      font-family: 'Inter', sans-serif; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: all 0.15s; min-height: 52px;
+    }
+    .mob-drawer-refresh:active { border-color: var(--gold); color: var(--gold); }
+    .mob-drawer-updated { font-size: 11px; color: var(--muted); text-align: center; margin-top: 8px; }
+
+    /* ── MOBILE CONTENT AREA ── */
+    .mob-content {
+      flex: 1; overflow-y: auto; overflow-x: hidden;
+      padding-bottom: calc(24px + env(safe-area-inset-bottom));
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* ── MOBILE EDITOR FILTER ── */
+    .mob-editor-filter {
+      padding: 12px 16px; display: flex; gap: 8px; align-items: center;
+      overflow-x: auto; -webkit-overflow-scrolling: touch;
+      scrollbar-width: none; border-bottom: 1px solid var(--border);
+    }
+    .mob-editor-filter::-webkit-scrollbar { display: none; }
+    .mob-filter-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; flex-shrink: 0; }
+    .mob-editor-btn {
+      padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border);
+      background: transparent; color: var(--text2); font-size: 13px; font-weight: 500;
+      font-family: 'Inter', sans-serif; cursor: pointer; flex-shrink: 0;
+      min-height: 44px; transition: all 0.15s; white-space: nowrap;
+    }
+    .mob-editor-btn.active { background: var(--gold); color: #000; border-color: var(--gold); font-weight: 600; }
+
+    /* ── MOBILE HERO ── */
+    .mob-hero {
+      padding: 28px 20px 24px; text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .mob-hero-eyebrow {
+      font-size: 10px; letter-spacing: 3px; color: var(--muted);
+      text-transform: uppercase; margin-bottom: 12px;
+    }
+    .mob-hero-amount {
+      font-family: 'Bebas Neue', sans-serif; font-size: clamp(64px, 20vw, 96px);
+      letter-spacing: 3px; color: var(--gold); line-height: 1;
+    }
+    .mob-hero-currency { font-size: 0.4em; vertical-align: top; margin-top: 0.2em; color: var(--gold-dim); }
+    .mob-hero-sub { font-size: 13px; color: var(--muted); margin-top: 10px; }
+
+    /* ── MOBILE STAT GRID ── */
+    .mob-stat-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 12px; padding: 20px 16px;
+    }
+    @media (max-width: 380px) {
+      .mob-stat-grid { grid-template-columns: 1fr; }
+    }
+    .mob-stat-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 16px; position: relative; overflow: hidden;
+    }
+    .mob-stat-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0;
+      height: 2px; border-radius: 12px 12px 0 0;
+    }
+    .mob-stat-card.ms-earnings { border-color: rgba(245,166,35,0.35); grid-column: 1/-1; }
+    .mob-stat-card.ms-earnings::before { background: linear-gradient(90deg, var(--gold), transparent); }
+    .mob-stat-card.ms-paid::before     { background: linear-gradient(90deg, var(--green), transparent); }
+    .mob-stat-card.ms-unpaid::before   { background: linear-gradient(90deg, var(--red), transparent); }
+    .mob-stat-card.ms-exported::before { background: linear-gradient(90deg, var(--teal), transparent); }
+    .mob-stat-card.ms-checking::before { background: linear-gradient(90deg, var(--amber), transparent); }
+    .mob-stat-card.ms-pending::before  { background: linear-gradient(90deg, var(--purple), transparent); }
+    .mob-stat-card.ms-total::before    { background: linear-gradient(90deg, var(--blue), transparent); }
+    .mob-stat-card.tap-active          { cursor: pointer; }
+    .mob-stat-card.tap-active:active   { transform: scale(0.98); }
+
+    .mob-stat-label { font-size: 10px; letter-spacing: 1.5px; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
+    .mob-stat-value { font-family: 'Bebas Neue', sans-serif; font-size: 30px; letter-spacing: 1px; line-height: 1; }
+    .mob-stat-card.ms-earnings .mob-stat-value { font-size: 38px; color: var(--gold); }
+    .mob-stat-card.ms-paid .mob-stat-value     { color: var(--green); }
+    .mob-stat-card.ms-unpaid .mob-stat-value   { color: var(--red); }
+    .mob-stat-card.ms-exported .mob-stat-value { color: var(--teal); }
+    .mob-stat-card.ms-checking .mob-stat-value { color: var(--amber); }
+    .mob-stat-card.ms-pending .mob-stat-value  { color: var(--purple); }
+    .mob-stat-card.ms-total .mob-stat-value    { color: var(--blue); }
+    .mob-stat-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+    .mob-tap-hint { font-size: 10px; color: var(--muted); margin-top: 6px; letter-spacing: 0.5px; }
+
+    /* ── EDITOR CARDS (mobile) ── */
+    .mob-editor-cards {
+      padding: 0 16px 20px; display: flex; flex-direction: column; gap: 10px;
+    }
+    .mob-editor-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+      padding: 18px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .mob-editor-card-info { flex: 1; min-width: 0; }
+    .mob-editor-card-tag { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; margin-bottom: 4px; }
+    .mob-editor-card-full { font-size: 13px; color: var(--text); font-weight: 600; }
+    .mob-editor-card-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+    .mob-editor-card-amt {
+      font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--text); text-align: right;
+      flex-shrink: 0;
+    }
+    .mob-editor-card-amt .mob-peso { font-size: 0.5em; color: var(--muted); vertical-align: top; margin-top: 0.25em; }
+
+    /* ── STATUS LEGEND (mobile) ── */
+    .mob-legend {
+      padding: 16px 20px; border-top: 1px solid var(--border);
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .mob-legend-title { font-size: 10px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 4px; }
+    .mob-legend-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .mob-legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text2); }
+    .mob-legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+    /* ── MOBILE SECTION HEADER ── */
+    .mob-section-header {
+      padding: 20px 16px 12px; display: flex; align-items: baseline; justify-content: space-between;
+    }
+    .mob-section-title { font-size: 12px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 1.5px; }
+    .mob-section-count { font-size: 12px; color: var(--muted); }
+
+    /* ── PROJECT CARDS (mobile client pages) ── */
+    .mob-project-cards { padding: 0 16px 16px; display: flex; flex-direction: column; gap: 10px; }
+    .mob-project-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 16px; position: relative; overflow: hidden;
+    }
+    .mob-project-card::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+      width: 3px; border-radius: 12px 0 0 12px;
+    }
+    .mob-project-card.wf-exported::before { background: var(--teal); }
+    .mob-project-card.wf-checking::before { background: var(--amber); }
+    .mob-project-card.wf-pending::before  { background: var(--purple); }
+    .mob-pc-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+    .mob-pc-name { font-size: 14px; font-weight: 600; color: var(--text); flex: 1; min-width: 0; padding-right: 8px; line-height: 1.3; }
+    .mob-pc-amount { font-family: 'Bebas Neue', sans-serif; font-size: 20px; flex-shrink: 0; }
+    .mob-pc-amount.mob-earned { color: var(--green); }
+    .mob-pc-amount.mob-owed   { color: var(--red); }
+    .mob-pc-amount.mob-none   { color: var(--muted); font-size: 14px; }
+    .mob-pc-meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+    .mob-pc-date { font-size: 11px; color: var(--muted); }
+
+    /* editable amount on mobile card */
+    .mob-pc-amount-wrap { display: flex; align-items: center; gap: 4px; }
+    .mob-pc-edit-btn {
+      background: none; border: none; color: var(--muted); font-size: 13px;
+      cursor: pointer; padding: 4px; line-height: 1; opacity: 0.6;
+      min-width: 28px; min-height: 28px; display: flex; align-items: center; justify-content: center;
+    }
+    .mob-pc-edit-btn:active { opacity: 1; color: var(--gold); }
+    .mob-amount-edit-input {
+      font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 0.5px;
+      background: var(--surface2); border: 1px solid var(--gold);
+      border-radius: 6px; color: var(--gold); padding: 4px 10px;
+      outline: none; width: 90px;
+    }
+    .mob-amount-edit-input::-webkit-inner-spin-button,
+    .mob-amount-edit-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+    /* ── SUMMARY CARDS (mobile summary pages) ── */
+    .mob-unpaid-total {
+      margin: 16px 16px 0; padding: 16px;
+      background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2);
+      border-radius: 10px; display: flex; justify-content: space-between; align-items: center;
+    }
+    .mob-unpaid-total-label { font-size: 13px; color: var(--text2); }
+    .mob-unpaid-total-amt { font-family: 'Bebas Neue', sans-serif; font-size: 26px; color: var(--red); }
+    .mob-summary-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 16px; position: relative; overflow: hidden;
+    }
+    .mob-summary-card::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+      width: 3px; border-radius: 12px 0 0 12px;
+    }
+    .mob-summary-card.sc-pending::before  { background: var(--purple); }
+    .mob-summary-card.sc-checking::before { background: var(--amber); }
+    .mob-summary-card.sc-unpaid::before   { background: var(--red); }
+    .mob-sc-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+    .mob-sc-client { font-size: 10px; letter-spacing: 2px; color: var(--gold); text-transform: uppercase; margin-bottom: 3px; }
+    .mob-sc-name { font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.3; }
+    .mob-sc-amount { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--red); flex-shrink: 0; }
+    .mob-sc-meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+    .mob-sc-date { font-size: 11px; color: var(--muted); }
+
+    /* ── MOBILE PRICING ── */
+    .mob-pricing-cards { padding: 16px; display: flex; flex-direction: column; gap: 12px; padding-bottom: 140px; }
+    .mob-pricing-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px; position: relative; overflow: hidden;
+    }
+    .mob-pricing-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0;
+      height: 2px; background: linear-gradient(90deg, var(--gold), transparent);
+      border-radius: 12px 12px 0 0;
+    }
+    .mob-pricing-client { font-size: 10px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 14px; }
+    .mob-pricing-row { display: flex; align-items: center; gap: 10px; }
+    .mob-pricing-symbol { font-family: 'Bebas Neue', sans-serif; font-size: 32px; color: var(--gold-dim); }
+    .mob-pricing-input {
+      font-family: 'Bebas Neue', sans-serif; font-size: 40px; color: var(--gold);
+      background: transparent; border: none; border-bottom: 2px solid var(--border);
+      outline: none; width: 100%; letter-spacing: 1px; line-height: 1.1;
+      padding-bottom: 4px; transition: border-color 0.15s; -webkit-appearance: none;
+    }
+    .mob-pricing-input:focus { border-color: var(--gold); }
+    .mob-pricing-input::-webkit-inner-spin-button,
+    .mob-pricing-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+    .mob-pricing-hint { font-size: 12px; color: var(--muted); margin-top: 10px; }
+
+    /* Sticky save bar */
+    .mob-pricing-sticky {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 90;
+      background: var(--surface); border-top: 1px solid var(--border);
+      padding: 12px 16px;
+      padding-bottom: calc(12px + env(safe-area-inset-bottom));
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .mob-pricing-save {
+      padding: 15px; background: var(--gold); color: #000; border: none;
+      border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 700;
+      cursor: pointer; width: 100%; min-height: 52px;
+    }
+    .mob-pricing-future {
+      padding: 13px; background: transparent; color: var(--text2); border: 1px solid var(--border);
+      border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500;
+      cursor: pointer; width: 100%; min-height: 52px;
+    }
+    .mob-pricing-saved { font-size: 12px; color: var(--green); text-align: center; opacity: 0; transition: opacity 0.3s; height: 0; overflow: hidden; }
+    .mob-pricing-saved.show { opacity: 1; height: auto; }
+
+    /* ── MOBILE PAGE HEADER ── */
+    .mob-page-header { padding: 20px 16px 0; }
+    .mob-page-eyebrow { font-size: 11px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 4px; }
+    .mob-page-title-large {
+      font-family: 'Bebas Neue', sans-serif; font-size: 34px; letter-spacing: 2px;
+      color: var(--text); line-height: 1;
+    }
+    .mob-page-title-large span { color: var(--gold); }
+
+    /* ── EMPTY STATE ── */
+    .mob-empty {
+      padding: 48px 20px; text-align: center; color: var(--muted); font-size: 14px;
+    }
+
+    /* ── CLIENT STAT ROW ── */
+    .mob-client-stats {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 16px;
+    }
+    .mob-client-stat-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 14px; position: relative; overflow: hidden;
+    }
+    .mob-client-stat-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    }
+    .mob-client-stat-card.mcs-earnings { grid-column: 1/-1; border-color: rgba(245,166,35,0.35); }
+    .mob-client-stat-card.mcs-earnings::before { background: linear-gradient(90deg, var(--gold), transparent); }
+    .mob-client-stat-card.mcs-unpaid::before   { background: linear-gradient(90deg, var(--red), transparent); }
+    .mob-client-stat-card.mcs-exported::before { background: linear-gradient(90deg, var(--teal), transparent); }
+    .mob-client-stat-card.mcs-checking::before { background: linear-gradient(90deg, var(--amber), transparent); }
+    .mob-client-stat-card.mcs-pending::before  { background: linear-gradient(90deg, var(--purple), transparent); }
+    .mob-csc-label { font-size: 10px; letter-spacing: 1.5px; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; }
+    .mob-csc-value { font-family: 'Bebas Neue', sans-serif; font-size: 28px; line-height: 1; }
+    .mob-client-stat-card.mcs-earnings .mob-csc-value { color: var(--gold); font-size: 36px; }
+    .mob-client-stat-card.mcs-unpaid .mob-csc-value   { color: var(--red); }
+    .mob-client-stat-card.mcs-exported .mob-csc-value { color: var(--teal); }
+    .mob-client-stat-card.mcs-checking .mob-csc-value { color: var(--amber); }
+    .mob-client-stat-card.mcs-pending .mob-csc-value  { color: var(--purple); }
+    .mob-csc-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+    /* ── SMOOTH TRANSITIONS ── */
+    .mob-content > div { animation: mob-fadein 0.2s ease both; }
+    @keyframes mob-fadein { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  }
 </style>
 </head>
 <body>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     DESKTOP APP (unchanged — hidden on mobile via CSS)
+═══════════════════════════════════════════════════════════════════ -->
 <div class="app">
-  <!-- ── SIDEBAR ── -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
       <div class="sidebar-logo-text">
@@ -318,7 +713,6 @@
       </div>
       <button class="sidebar-toggle" id="sidebar-toggle" onclick="toggleSidebar()" title="Toggle sidebar">&#9776;</button>
     </div>
-
     <div class="sidebar-section">Overview</div>
     <div class="nav-item active" id="nav-home" onclick="switchTab('home')">
       <div class="dot" style="background:var(--gold)"></div>
@@ -328,10 +722,8 @@
       <div class="dot" style="background:var(--gold-dim)"></div>
       <span class="nav-item-label">Pricing Manager</span>
     </div>
-
     <div class="sidebar-section">Clients</div>
     <div id="client-nav"></div>
-
     <div class="sidebar-bottom">
       <button class="refresh-btn" onclick="loadData()">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
@@ -341,7 +733,6 @@
     </div>
   </aside>
 
-  <!-- ── MAIN ── -->
   <main class="main" id="main-content">
     <div id="page-home"></div>
     <div id="page-client"  style="display:none"></div>
@@ -350,9 +741,64 @@
   </main>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════════════════
+     MOBILE SHELL (shown only on ≤768px)
+═══════════════════════════════════════════════════════════════════ -->
+<div id="mobile-root">
+  <!-- Top Bar -->
+  <header class="mob-topbar">
+    <button class="mob-hamburger" onclick="mobOpenDrawer()" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="mob-logo">V<span class="mob-logo-dot">E</span></div>
+    <div class="mob-page-title" id="mob-page-title">Dashboard</div>
+    <div class="mob-refresh-indicator" id="mob-refresh-dot"></div>
+  </header>
+
+  <!-- Drawer overlay -->
+  <div class="mob-drawer-overlay" id="mob-overlay" onclick="mobCloseDrawer()"></div>
+
+  <!-- Drawer panel -->
+  <nav class="mob-drawer" id="mob-drawer">
+    <div class="mob-drawer-header">
+      <div>
+        <div class="mob-drawer-logo">V<span style="color:var(--text2)">E</span></div>
+        <div class="mob-drawer-logo-sub">Earnings Tracker</div>
+      </div>
+      <button class="mob-drawer-close" onclick="mobCloseDrawer()">✕</button>
+    </div>
+
+    <div class="mob-drawer-nav">
+      <div class="mob-drawer-section">Overview</div>
+      <div class="mob-nav-item active" id="mob-nav-home" onclick="mobSwitchTab('home')">
+        <div class="mob-nav-dot" style="background:var(--gold)"></div>
+        <span class="mob-nav-label">Dashboard</span>
+      </div>
+      <div class="mob-nav-item" id="mob-nav-pricing" onclick="mobSwitchTab('pricing')">
+        <div class="mob-nav-dot" style="background:var(--gold-dim)"></div>
+        <span class="mob-nav-label">Pricing Manager</span>
+      </div>
+
+      <div class="mob-drawer-section">Clients</div>
+      <div id="mob-client-nav"></div>
+    </div>
+
+    <div class="mob-drawer-bottom">
+      <button class="mob-drawer-refresh" onclick="loadData(); mobCloseDrawer();">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        Refresh Data
+      </button>
+      <div class="mob-drawer-updated" id="mob-last-updated">–</div>
+    </div>
+  </nav>
+
+  <!-- Main content area -->
+  <div class="mob-content" id="mob-content"></div>
+</div>
+
 <script>
 // ═══════════════════════════════════════════════════════════════════════════
-// RATES — loaded from localStorage; hardcoded defaults are fallbacks ONLY
+// RATES
 // ═══════════════════════════════════════════════════════════════════════════
 const RATE_DEFAULTS = {
   'LHF': 500, 'Boney': 500, 'L&S': 500, 'Jeya': 500,
@@ -370,56 +816,40 @@ function loadRates() {
     for (const [k, v] of Object.entries(RATE_DEFAULTS)) {
       if (clientRates[k] === undefined) clientRates[k] = v;
     }
-    // Force BullionFX back to 500
     clientRates['BullionFX'] = 500;
-  } catch (e) {
-    clientRates = { ...RATE_DEFAULTS };
-  }
+  } catch (e) { clientRates = { ...RATE_DEFAULTS }; }
 }
 
-function saveRates() {
-  localStorage.setItem('clientRates', JSON.stringify(clientRates));
-}
+function saveRates() { localStorage.setItem('clientRates', JSON.stringify(clientRates)); }
 
 function loadFutureRates() {
   try {
     const saved = localStorage.getItem('futureClientRates');
     futureClientRates = saved ? JSON.parse(saved) : { ...clientRates };
-  } catch (e) {
-    futureClientRates = { ...clientRates };
-  }
+  } catch (e) { futureClientRates = { ...clientRates }; }
   for (const [k, v] of Object.entries(RATE_DEFAULTS)) {
-    if (futureClientRates[k] === undefined) {
-      futureClientRates[k] = clientRates[k] ?? v;
-    }
+    if (futureClientRates[k] === undefined) futureClientRates[k] = clientRates[k] ?? v;
   }
-  // Force BullionFX back to 500
   futureClientRates['BullionFX'] = 500;
 }
 
-function saveFutureRates() {
-  localStorage.setItem('futureClientRates', JSON.stringify(futureClientRates));
-}
+function saveFutureRates() { localStorage.setItem('futureClientRates', JSON.stringify(futureClientRates)); }
 
 function loadProjectSnapshots() {
   try {
     const saved = localStorage.getItem('projectPriceSnapshots');
     projectPriceSnapshots = saved ? JSON.parse(saved) : {};
-  } catch (e) {
-    projectPriceSnapshots = {};
-  }
+  } catch (e) { projectPriceSnapshots = {}; }
 }
 
-function saveProjectSnapshots() {
-  localStorage.setItem('projectPriceSnapshots', JSON.stringify(projectPriceSnapshots));
-}
+function saveProjectSnapshots() { localStorage.setItem('projectPriceSnapshots', JSON.stringify(projectPriceSnapshots)); }
 
 function getRate(clientName) {
   return clientRates[clientName] !== undefined ? clientRates[clientName] : 500;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// PER-PROJECT PRICE OVERRIDES
+// PROJECT OVERRIDES
 // ═══════════════════════════════════════════════════════════════════════════
 let projectOverrides = {};
 
@@ -430,22 +860,14 @@ function loadProjectOverrides() {
   } catch(e) { projectOverrides = {}; }
 }
 
-function saveProjectOverrides() {
-  localStorage.setItem('projectOverrides', JSON.stringify(projectOverrides));
-}
+function saveProjectOverrides() { localStorage.setItem('projectOverrides', JSON.stringify(projectOverrides)); }
 
-function getProjectKey(clientName, projectName) {
-  return clientName + '||' + projectName;
-}
+function getProjectKey(clientName, projectName) { return clientName + '||' + projectName; }
 
 function getProjectRate(clientName, projectName) {
   const overrideKey = getProjectKey(clientName, projectName);
-  if (projectOverrides[overrideKey] !== undefined) {
-    return projectOverrides[overrideKey];
-  }
-  if (projectPriceSnapshots[overrideKey] !== undefined) {
-    return projectPriceSnapshots[overrideKey];
-  }
+  if (projectOverrides[overrideKey] !== undefined) return projectOverrides[overrideKey];
+  if (projectPriceSnapshots[overrideKey] !== undefined) return projectPriceSnapshots[overrideKey];
   const rate = futureClientRates[clientName] ?? getRate(clientName);
   projectPriceSnapshots[overrideKey] = rate;
   saveProjectSnapshots();
@@ -456,7 +878,6 @@ function setProjectRate(clientName, projectName, value) {
   const key = getProjectKey(clientName, projectName);
   projectOverrides[key] = value;
   saveProjectOverrides();
-  // Re-render immediately — no pending state, no refresh button
   renderAll();
 }
 
@@ -471,7 +892,7 @@ function hasProjectOverride(clientName, projectName) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// SIDEBAR COLLAPSE STATE
+// SIDEBAR COLLAPSE (desktop)
 // ═══════════════════════════════════════════════════════════════════════════
 function toggleSidebar() {
   const sb = document.getElementById('sidebar');
@@ -481,23 +902,20 @@ function toggleSidebar() {
 
 function applySidebarState() {
   const saved = localStorage.getItem('sidebarCollapsed');
-  if (saved === 'true') {
-    document.getElementById('sidebar').classList.add('collapsed');
-  }
+  if (saved === 'true') document.getElementById('sidebar').classList.add('collapsed');
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// FULL NAME MAPPINGS
+// NAMES
 // ═══════════════════════════════════════════════════════════════════════════
 const FULL_NAMES = { 'neil': 'Neil Pangilinan', 'aus': 'Austin Garcia' };
-
 function getFullName(shortName) {
   const n = (shortName || '').toLowerCase().trim();
   return FULL_NAMES[n] || shortName || 'Unknown';
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// CLIENT DEFINITIONS
+// CLIENTS
 // ═══════════════════════════════════════════════════════════════════════════
 const CLIENTS = [
   { name:"LHF",          sheet:"1xU1qVfUaCwj5cVlvdY-SKnU4Cw2MqgV2mDA-OlgQgX0", gid:"0",          cols:{date:0,editor:1,project:2,frame:3,revised:5,status:6} },
@@ -514,7 +932,7 @@ let activeTab  = 'home';
 let activeEditor = 'all';
 
 // ═══════════════════════════════════════════════════════════════════════════
-// STATUS SYSTEMS
+// STATUS
 // ═══════════════════════════════════════════════════════════════════════════
 function getWorkflowStatus(row) {
   const hasRevised = !!(row.revised && row.revised.trim());
@@ -535,7 +953,7 @@ function getPaymentStatus(row) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// CSV HELPERS
+// CSV
 // ═══════════════════════════════════════════════════════════════════════════
 function splitCSVLine(line) {
   const result = []; let cur = '', inQ = false;
@@ -577,7 +995,14 @@ async function fetchSheet(sheetId, gid) {
 }
 
 async function loadData() {
-  document.getElementById('last-updated').textContent = 'Refreshing…';
+  const updatedEl = document.getElementById('last-updated');
+  const mobUpdatedEl = document.getElementById('mob-last-updated');
+  const mobDot = document.getElementById('mob-refresh-dot');
+
+  if (updatedEl) updatedEl.textContent = 'Refreshing…';
+  if (mobUpdatedEl) mobUpdatedEl.textContent = 'Refreshing…';
+  if (mobDot) { mobDot.classList.remove('done'); mobDot.classList.add('active'); }
+
   try {
     allData = {};
     for (const client of CLIENTS) {
@@ -586,10 +1011,15 @@ async function loadData() {
       if (rows.length) allData[client.name] = rows;
     }
     renderAll();
-    document.getElementById('last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString();
+    const timeStr = 'Updated ' + new Date().toLocaleTimeString();
+    if (updatedEl) updatedEl.textContent = timeStr;
+    if (mobUpdatedEl) mobUpdatedEl.textContent = timeStr;
+    if (mobDot) { mobDot.classList.remove('active'); mobDot.classList.add('done'); }
   } catch (e) {
     console.error('loadData error:', e);
-    document.getElementById('last-updated').textContent = 'Refresh failed';
+    if (updatedEl) updatedEl.textContent = 'Refresh failed';
+    if (mobUpdatedEl) mobUpdatedEl.textContent = 'Refresh failed';
+    if (mobDot) { mobDot.classList.remove('active'); }
   }
 }
 
@@ -616,14 +1046,10 @@ function computeClientStats(rows, clientName) {
     if (ps === 'unpaid') pendingAmount += rate;
   }
   return {
-    total:         f.filter(r => getWorkflowStatus(r) !== null).length,
-    paid:          tally.paid,
-    unpaid:        tally.unpaid,
-    exported:      tally.exported,
-    checking:      tally.checking,
-    pending:       tally.pending,
-    earnings,
-    pendingAmount,
+    total: f.filter(r => getWorkflowStatus(r) !== null).length,
+    paid: tally.paid, unpaid: tally.unpaid,
+    exported: tally.exported, checking: tally.checking, pending: tally.pending,
+    earnings, pendingAmount,
   };
 }
 
@@ -664,7 +1090,7 @@ function getGlobalEarningsBreakdown() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// RENDER HELPERS
+// RENDER HELPERS (shared)
 // ═══════════════════════════════════════════════════════════════════════════
 function badgeHTML(status) {
   const map = {
@@ -745,17 +1171,13 @@ function startInlineEdit(cell) {
   const pencil = cell.querySelector('.edit-pencil');
   if (pencil) pencil.style.display = 'none';
   const input = document.createElement('input');
-  input.type  = 'number';
-  input.min   = '0';
-  input.value = current;
+  input.type  = 'number'; input.min = '0'; input.value = current;
   input.className = 'amount-inline-input';
   cell.insertBefore(input, amountSpan);
-  input.focus();
-  input.select();
+  input.focus(); input.select();
   let committed = false;
   function commit() {
-    if (committed) return;
-    committed = true;
+    if (committed) return; committed = true;
     const val = parseInt(input.value, 10);
     if (!isNaN(val) && val >= 0) setProjectRate(clientName, projectName, val);
     else renderAll();
@@ -773,6 +1195,26 @@ function doResetProjectRate(safeClient, safeProject) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// MOBILE DRAWER
+// ═══════════════════════════════════════════════════════════════════════════
+function mobOpenDrawer() {
+  document.getElementById('mob-drawer').classList.add('open');
+  document.getElementById('mob-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function mobCloseDrawer() {
+  document.getElementById('mob-drawer').classList.remove('open');
+  document.getElementById('mob-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function mobSwitchTab(tab) {
+  mobCloseDrawer();
+  switchTab(tab);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // RENDER PIPELINE
 // ═══════════════════════════════════════════════════════════════════════════
 function setEditor(name) { activeEditor = name; renderAll(); }
@@ -781,18 +1223,22 @@ function switchTab(tab) {
   activeTab = tab;
   renderAll();
   window.scrollTo(0, 0);
+  const mobContent = document.getElementById('mob-content');
+  if (mobContent) mobContent.scrollTop = 0;
 }
 
 function renderAll() {
   renderSidebar();
-  if      (activeTab === 'home')             renderHome();
-  else if (activeTab === 'pricing')          renderPricing();
-  else if (activeTab === 'summary-pending')  renderSummaryPage('pending');
-  else if (activeTab === 'summary-checking') renderSummaryPage('checking');
-  else if (activeTab === 'summary-unpaid')   renderSummaryPage('unpaid');
-  else                                       renderClient(activeTab);
+  renderMobileNav();
+  if      (activeTab === 'home')             { renderHome(); renderMobileHome(); }
+  else if (activeTab === 'pricing')          { renderPricing(); renderMobilePricing(); }
+  else if (activeTab === 'summary-pending')  { renderSummaryPage('pending');  renderMobileSummary('pending'); }
+  else if (activeTab === 'summary-checking') { renderSummaryPage('checking'); renderMobileSummary('checking'); }
+  else if (activeTab === 'summary-unpaid')   { renderSummaryPage('unpaid');   renderMobileSummary('unpaid'); }
+  else                                       { renderClient(activeTab); renderMobileClient(activeTab); }
 }
 
+// ── DESKTOP SIDEBAR ───────────────────────────────────────────────────────
 function renderSidebar() {
   const nav    = document.getElementById('client-nav');
   const colors = ['#60a5fa','#f472b6','#34d399','#a78bfa','#fb923c','#e879f9','#f9a8d4'];
@@ -809,7 +1255,498 @@ function renderSidebar() {
   }).join('');
 }
 
-// ── HOME / DASHBOARD ──────────────────────────────────────────────────────
+// ── MOBILE NAV ────────────────────────────────────────────────────────────
+function renderMobileNav() {
+  const nav    = document.getElementById('mob-client-nav');
+  const colors = ['#60a5fa','#f472b6','#34d399','#a78bfa','#fb923c','#e879f9','#f9a8d4'];
+  const homeEl    = document.getElementById('mob-nav-home');
+  const pricingEl = document.getElementById('mob-nav-pricing');
+  if (homeEl)    homeEl.className    = activeTab === 'home'    ? 'mob-nav-item active' : 'mob-nav-item';
+  if (pricingEl) pricingEl.className = activeTab === 'pricing' ? 'mob-nav-item active' : 'mob-nav-item';
+
+  nav.innerHTML = Object.keys(allData).map((c, i) => {
+    const count  = filterByEditor(allData[c]).filter(r => getWorkflowStatus(r) !== null).length;
+    const active = activeTab === c ? 'active' : '';
+    return `<div class="mob-nav-item ${active}" onclick="mobSwitchTab('${c}')">
+      <div class="mob-nav-dot" style="background:${colors[i % colors.length]}"></div>
+      <span class="mob-nav-label">${c}</span>
+      <span class="mob-nav-count">${count}</span>
+    </div>`;
+  }).join('');
+
+  // Update top bar title
+  const titleEl = document.getElementById('mob-page-title');
+  if (titleEl) {
+    const titleMap = {
+      home: 'Dashboard',
+      pricing: 'Pricing',
+      'summary-pending': 'Pending',
+      'summary-checking': 'For Checking',
+      'summary-unpaid': 'Unpaid',
+    };
+    titleEl.textContent = titleMap[activeTab] || activeTab;
+  }
+}
+
+// ── MOBILE EDITOR FILTER ──────────────────────────────────────────────────
+function mobEditorFilterHTML() {
+  const editors = getEditors();
+  const allActive = activeEditor === 'all' ? 'active' : '';
+  const btns = editors.map(e => {
+    const active = activeEditor === e ? 'active' : '';
+    return `<button class="mob-editor-btn ${active}" onclick="setEditor('${e}')">${e}</button>`;
+  }).join('');
+  return `<div class="mob-editor-filter">
+    <span class="mob-filter-label">Editor:</span>
+    <button class="mob-editor-btn ${allActive}" onclick="setEditor('all')">All</button>
+    ${btns}
+  </div>`;
+}
+
+// ── MOBILE BADGE ──────────────────────────────────────────────────────────
+function mobBadgeHTML(status) {
+  return badgeHTML(status); // reuse desktop badge HTML (same CSS classes work on mobile)
+}
+
+function mobEditorTagHTML(editor) {
+  const cls = editor.toLowerCase() === 'aus'  ? 'editor-aus'
+            : editor.toLowerCase() === 'neil' ? 'editor-neil' : '';
+  const fullName = getFullName(editor);
+  return `<span class="editor-tag ${cls}" title="${fullName}">${editor || '–'}</span>`;
+}
+
+// ── MOBILE HOME ───────────────────────────────────────────────────────────
+function renderMobileHome() {
+  const cont = document.getElementById('mob-content');
+  const g    = computeGlobal();
+  const fin  = getGlobalEarningsBreakdown();
+  const editors = getEditors().filter(ed => activeEditor === 'all' || activeEditor === ed);
+
+  const editorCardsHTML = editors.map(ed => {
+    const info = g.editorMap[ed] || {};
+    const full = getFullName(ed);
+    const cls  = ed.toLowerCase() === 'aus' ? 'editor-aus' : ed.toLowerCase() === 'neil' ? 'editor-neil' : '';
+    const inProgress = (info.exported||0) + (info.checking||0) + (info.pending||0);
+    return `<div class="mob-editor-card">
+      <div class="mob-editor-card-info">
+        <span class="mob-editor-card-tag editor-tag ${cls}">${ed}</span>
+        <div class="mob-editor-card-full">${full}</div>
+        <div class="mob-editor-card-sub">${info.paid||0} paid · ${info.unpaid||0} unpaid · ${inProgress} active</div>
+      </div>
+      <div class="mob-editor-card-amt"><span class="mob-peso">₱</span>${(info.earnings||0).toLocaleString()}</div>
+    </div>`;
+  }).join('');
+
+  cont.innerHTML = `
+    <div>
+      ${mobEditorFilterHTML()}
+
+      <div class="mob-hero">
+        <div class="mob-hero-eyebrow">Total Earnings · Paid Videos</div>
+        <div class="mob-hero-amount">
+          <span class="mob-hero-currency">₱</span><span id="mob-count-num">0</span>
+        </div>
+        <div class="mob-hero-sub">${g.paid} video${g.paid !== 1 ? 's' : ''} paid total</div>
+      </div>
+
+      <div class="mob-stat-grid">
+        <div class="mob-stat-card ms-earnings">
+          <div class="mob-stat-label">Total Earnings</div>
+          <div class="mob-stat-value" id="mob-count-earnings">₱0</div>
+          <div class="mob-stat-sub">${g.paid} paid videos</div>
+        </div>
+        <div class="mob-stat-card ms-paid">
+          <div class="mob-stat-label">Paid</div>
+          <div class="mob-stat-value" id="mob-count-paid">0</div>
+          <div class="mob-stat-sub">videos</div>
+        </div>
+        <div class="mob-stat-card ms-unpaid tap-active" onclick="switchTab('summary-unpaid')">
+          <div class="mob-stat-label">Not Paid</div>
+          <div class="mob-stat-value" id="mob-count-unpaid">0</div>
+          <div class="mob-stat-sub">${fmt(fin.unpaidSum)} owed</div>
+          <div class="mob-tap-hint">Tap to view ↗</div>
+        </div>
+        <div class="mob-stat-card ms-exported">
+          <div class="mob-stat-label">Exported</div>
+          <div class="mob-stat-value">${g.exported}</div>
+          <div class="mob-stat-sub">revised file</div>
+        </div>
+        <div class="mob-stat-card ms-checking tap-active" onclick="switchTab('summary-checking')">
+          <div class="mob-stat-label">For Checking</div>
+          <div class="mob-stat-value">${g.checking}</div>
+          <div class="mob-tap-hint">Tap to view ↗</div>
+        </div>
+        <div class="mob-stat-card ms-pending tap-active" onclick="switchTab('summary-pending')">
+          <div class="mob-stat-label">Pending</div>
+          <div class="mob-stat-value">${g.pending}</div>
+          <div class="mob-tap-hint">Tap to view ↗</div>
+        </div>
+      </div>
+
+      ${editorCardsHTML ? `
+        <div class="mob-section-header">
+          <span class="mob-section-title">Editors</span>
+        </div>
+        <div class="mob-editor-cards">${editorCardsHTML}</div>
+      ` : ''}
+
+      <div class="mob-legend">
+        <div class="mob-legend-title">Status Key</div>
+        <div class="mob-legend-grid">
+          <div class="mob-legend-item"><span class="mob-legend-dot" style="background:#22c55e"></span>Paid</div>
+          <div class="mob-legend-item"><span class="mob-legend-dot" style="background:#ef4444"></span>Not Paid</div>
+          <div class="mob-legend-item"><span class="mob-legend-dot" style="background:#2dd4bf"></span>Exported</div>
+          <div class="mob-legend-item"><span class="mob-legend-dot" style="background:#fbbf24"></span>For Checking</div>
+          <div class="mob-legend-item"><span class="mob-legend-dot" style="background:#a78bfa"></span>Pending</div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  mobCountUp('mob-count-num',      fin.paidSum, 1200);
+  mobCountUp('mob-count-earnings', fin.paidSum, 1200, true);
+  mobCountUp('mob-count-paid',     g.paid,      900);
+  mobCountUp('mob-count-unpaid',   g.unpaid,    900);
+}
+
+// ── MOBILE CLIENT ─────────────────────────────────────────────────────────
+function renderMobileClient(clientName) {
+  const cont    = document.getElementById('mob-content');
+  const rows    = allData[clientName] || [];
+  const filtered = filterByEditor(rows).filter(r => getWorkflowStatus(r) !== null);
+  const s        = computeClientStats(rows, clientName);
+
+  // Update top bar title
+  const titleEl = document.getElementById('mob-page-title');
+  if (titleEl) titleEl.textContent = clientName;
+
+  const projectCards = filtered.map(r => {
+    const ws   = getWorkflowStatus(r);
+    const ps   = getPaymentStatus(r);
+    const rate = getProjectRate(clientName, r.project);
+    const safeClient  = encodeURIComponent(clientName);
+    const safeProject = encodeURIComponent(r.project);
+
+    let amtHTML;
+    if (ps === 'paid') {
+      amtHTML = `<div class="mob-pc-amount-wrap">
+        <span class="mob-pc-amount mob-earned">₱${rate.toLocaleString()}</span>
+        <button class="mob-pc-edit-btn" onclick="mobStartAmountEdit(this,'${safeClient}','${safeProject}')" title="Edit price">✎</button>
+      </div>`;
+    } else if (ps === 'unpaid') {
+      amtHTML = `<div class="mob-pc-amount-wrap">
+        <span class="mob-pc-amount mob-owed">₱${rate.toLocaleString()}</span>
+        <button class="mob-pc-edit-btn" onclick="mobStartAmountEdit(this,'${safeClient}','${safeProject}')" title="Edit price">✎</button>
+      </div>`;
+    } else {
+      amtHTML = `<span class="mob-pc-amount mob-none">–</span>`;
+    }
+
+    return `<div class="mob-project-card wf-${ws}">
+      <div class="mob-pc-top">
+        <div class="mob-pc-name">${r.project || '–'}</div>
+        ${amtHTML}
+      </div>
+      <div class="mob-pc-meta">
+        ${r.date ? `<span class="mob-pc-date">${r.date}</span>` : ''}
+        ${mobEditorTagHTML(r.editor)}
+        ${mobBadgeHTML(ws)}
+        ${ps ? mobBadgeHTML(ps) : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  cont.innerHTML = `
+    <div>
+      ${mobEditorFilterHTML()}
+
+      <div class="mob-page-header">
+        <div class="mob-page-eyebrow">Client Log</div>
+        <div class="mob-page-title-large"><span>${clientName}</span></div>
+      </div>
+
+      <div class="mob-client-stats">
+        <div class="mob-client-stat-card mcs-earnings">
+          <div class="mob-csc-label">Earnings</div>
+          <div class="mob-csc-value">${fmt(s.earnings)}</div>
+          <div class="mob-csc-sub">${s.paid} paid · ${fmt(getRate(clientName))}/ea default</div>
+        </div>
+        <div class="mob-client-stat-card mcs-unpaid tap-active" onclick="switchTab('summary-unpaid')" style="cursor:pointer">
+          <div class="mob-csc-label">Owed</div>
+          <div class="mob-csc-value">${fmt(s.pendingAmount)}</div>
+          <div class="mob-csc-sub">${s.unpaid} unpaid ↗</div>
+        </div>
+        <div class="mob-client-stat-card mcs-exported">
+          <div class="mob-csc-label">Exported</div>
+          <div class="mob-csc-value">${s.exported}</div>
+        </div>
+        <div class="mob-client-stat-card mcs-checking tap-active" onclick="switchTab('summary-checking')" style="cursor:pointer">
+          <div class="mob-csc-label">Checking</div>
+          <div class="mob-csc-value">${s.checking}</div>
+        </div>
+        <div class="mob-client-stat-card mcs-pending tap-active" onclick="switchTab('summary-pending')" style="cursor:pointer">
+          <div class="mob-csc-label">Pending</div>
+          <div class="mob-csc-value">${s.pending}</div>
+        </div>
+      </div>
+
+      <div class="mob-section-header">
+        <span class="mob-section-title">Projects</span>
+        <span class="mob-section-count">${filtered.length} entries</span>
+      </div>
+      <div class="mob-project-cards">
+        ${projectCards || '<div class="mob-empty">No projects found.</div>'}
+      </div>
+    </div>
+  `;
+}
+
+function mobStartAmountEdit(btn, safeClient, safeProject) {
+  const clientName  = decodeURIComponent(safeClient);
+  const projectName = decodeURIComponent(safeProject);
+  const current     = getProjectRate(clientName, projectName);
+  const wrap        = btn.closest('.mob-pc-amount-wrap');
+  if (!wrap || wrap.querySelector('.mob-amount-edit-input')) return;
+
+  const amtSpan = wrap.querySelector('.mob-pc-amount');
+  if (amtSpan) amtSpan.style.display = 'none';
+  btn.style.display = 'none';
+
+  const input = document.createElement('input');
+  input.type = 'number'; input.min = '0'; input.value = current;
+  input.className = 'mob-amount-edit-input';
+  wrap.insertBefore(input, amtSpan);
+  input.focus(); input.select();
+
+  let committed = false;
+  function commit() {
+    if (committed) return; committed = true;
+    const val = parseInt(input.value, 10);
+    if (!isNaN(val) && val >= 0) setProjectRate(clientName, projectName, val);
+    else renderAll();
+  }
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter')  { e.preventDefault(); commit(); }
+    if (e.key === 'Escape') { committed = true; renderAll(); }
+  });
+  input.addEventListener('blur', commit);
+}
+
+// ── MOBILE SUMMARY ────────────────────────────────────────────────────────
+function renderMobileSummary(type) {
+  const cont = document.getElementById('mob-content');
+  const titleMap = { pending:'Pending', checking:'For Checking', unpaid:'Unpaid' };
+  const isPayment = (type === 'unpaid');
+  const matches   = [];
+  let owedSum     = 0;
+
+  for (const [clientName, rows] of Object.entries(allData)) {
+    for (const r of filterByEditor(rows)) {
+      const match = isPayment
+        ? getPaymentStatus(r) === 'unpaid'
+        : getWorkflowStatus(r) === type;
+      if (match) {
+        matches.push({ client: clientName, r });
+        if (isPayment) owedSum += getProjectRate(clientName, r.project);
+      }
+    }
+  }
+
+  const summaryClass = `sc-${type}`;
+  const scards = matches.map(({ client, r }) => {
+    const ws   = getWorkflowStatus(r);
+    const ps   = getPaymentStatus(r);
+    const rate = getProjectRate(client, r.project);
+    const safeClient  = encodeURIComponent(client);
+    const safeProject = encodeURIComponent(r.project);
+
+    let amtHTML = '';
+    if (isPayment) {
+      amtHTML = `<div class="mob-pc-amount-wrap">
+        <span class="mob-sc-amount">₱${rate.toLocaleString()}</span>
+        <button class="mob-pc-edit-btn" onclick="mobStartSummaryEdit(this,'${safeClient}','${safeProject}')" title="Edit price">✎</button>
+      </div>`;
+    }
+
+    return `<div class="mob-summary-card ${summaryClass}">
+      <div class="mob-sc-top">
+        <div>
+          <div class="mob-sc-client">${client}</div>
+          <div class="mob-sc-name">${r.project || '–'}</div>
+        </div>
+        ${amtHTML}
+      </div>
+      <div class="mob-sc-meta">
+        ${r.date ? `<span class="mob-sc-date">${r.date}</span>` : ''}
+        ${mobEditorTagHTML(r.editor)}
+        ${mobBadgeHTML(type)}
+        ${ws && ws !== type ? mobBadgeHTML(ws) : ''}
+        ${ps && ps !== type ? mobBadgeHTML(ps) : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Update top bar
+  const titleEl = document.getElementById('mob-page-title');
+  if (titleEl) titleEl.textContent = titleMap[type];
+
+  cont.innerHTML = `
+    <div>
+      ${mobEditorFilterHTML()}
+
+      <div class="mob-page-header">
+        <div class="mob-page-eyebrow">Global Aggregate</div>
+        <div class="mob-page-title-large"><span>${titleMap[type]}</span></div>
+      </div>
+
+      ${isPayment ? `
+        <div class="mob-unpaid-total">
+          <span class="mob-unpaid-total-label">${matches.length} unpaid · Total Owed</span>
+          <span class="mob-unpaid-total-amt">${fmt(owedSum)}</span>
+        </div>
+      ` : ''}
+
+      <div class="mob-section-header">
+        <span class="mob-section-title">Matched Items</span>
+        <span class="mob-section-count">${matches.length} items</span>
+      </div>
+
+      <div class="mob-project-cards">
+        ${scards || '<div class="mob-empty">No items found for this status.</div>'}
+      </div>
+    </div>
+  `;
+}
+
+function mobStartSummaryEdit(btn, safeClient, safeProject) {
+  // Same logic as mobStartAmountEdit but target mob-sc-amount
+  const clientName  = decodeURIComponent(safeClient);
+  const projectName = decodeURIComponent(safeProject);
+  const current     = getProjectRate(clientName, projectName);
+  const wrap        = btn.closest('.mob-pc-amount-wrap');
+  if (!wrap || wrap.querySelector('.mob-amount-edit-input')) return;
+
+  const amtSpan = wrap.querySelector('.mob-sc-amount');
+  if (amtSpan) amtSpan.style.display = 'none';
+  btn.style.display = 'none';
+
+  const input = document.createElement('input');
+  input.type = 'number'; input.min = '0'; input.value = current;
+  input.className = 'mob-amount-edit-input';
+  wrap.insertBefore(input, amtSpan);
+  input.focus(); input.select();
+
+  let committed = false;
+  function commit() {
+    if (committed) return; committed = true;
+    const val = parseInt(input.value, 10);
+    if (!isNaN(val) && val >= 0) setProjectRate(clientName, projectName, val);
+    else renderAll();
+  }
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter')  { e.preventDefault(); commit(); }
+    if (e.key === 'Escape') { committed = true; renderAll(); }
+  });
+  input.addEventListener('blur', commit);
+}
+
+// ── MOBILE PRICING ────────────────────────────────────────────────────────
+function renderMobilePricing() {
+  const cont = document.getElementById('mob-content');
+  const titleEl = document.getElementById('mob-page-title');
+  if (titleEl) titleEl.textContent = 'Pricing';
+
+  const cards = Object.keys(RATE_DEFAULTS).map(clientName => {
+    const current = getRate(clientName);
+    const id = 'mob-rate-' + clientName.replace(/[^a-z0-9]/gi, '_');
+    return `<div class="mob-pricing-card">
+      <div class="mob-pricing-client">${clientName}</div>
+      <div class="mob-pricing-row">
+        <span class="mob-pricing-symbol">₱</span>
+        <input
+          class="mob-pricing-input"
+          type="number" min="0"
+          id="${id}"
+          value="${current}"
+          data-client="${clientName}"
+          inputmode="numeric"
+          onchange="onRateChange(this)"
+        />
+      </div>
+      <div class="mob-pricing-hint">per video · tap to edit</div>
+    </div>`;
+  }).join('');
+
+  cont.innerHTML = `
+    <div style="padding-bottom: 160px">
+      <div class="mob-page-header" style="margin-bottom:4px">
+        <div class="mob-page-eyebrow">Settings</div>
+        <div class="mob-page-title-large">PRICING <span>MANAGER</span></div>
+      </div>
+
+      <div style="padding: 12px 16px 0; font-size:13px; color:var(--text2); line-height:1.65">
+        Rates persist in your browser and recalculate all earnings on save.
+        Use "Save Future" to apply rates only to new projects.
+      </div>
+
+      <div class="mob-pricing-cards">${cards}</div>
+    </div>
+
+    <div class="mob-pricing-sticky">
+      <span class="mob-pricing-saved" id="mob-pricing-saved-msg"></span>
+      <button class="mob-pricing-save" onclick="mobSavePricing()">Save All Rates</button>
+      <button class="mob-pricing-future" onclick="mobSaveFutureRates()">Save Future Rates Only</button>
+    </div>
+  `;
+}
+
+function onRateChange(input) {
+  const client = input.getAttribute('data-client');
+  const val    = parseInt(input.value, 10);
+  if (!isNaN(val) && val >= 0) clientRates[client] = val;
+}
+
+function mobSavePricing() {
+  for (const clientName of Object.keys(RATE_DEFAULTS)) {
+    const id  = 'mob-rate-' + clientName.replace(/[^a-z0-9]/gi, '_');
+    const inp = document.getElementById(id);
+    if (!inp) continue;
+    const val = parseInt(inp.value, 10);
+    if (isNaN(val) || val < 0) continue;
+    clientRates[clientName]       = val;
+    futureClientRates[clientName] = val;
+    Object.keys(projectPriceSnapshots).forEach(key => {
+      if (key.startsWith(clientName + '||')) projectPriceSnapshots[key] = val;
+    });
+  }
+  saveRates(); saveFutureRates(); saveProjectSnapshots();
+  const msg = document.getElementById('mob-pricing-saved-msg');
+  if (msg) {
+    msg.textContent = '✓ All rates saved';
+    msg.classList.add('show');
+    setTimeout(() => { msg.textContent = ''; msg.classList.remove('show'); }, 2500);
+  }
+  renderAll();
+}
+
+function mobSaveFutureRates() {
+  for (const clientName of Object.keys(RATE_DEFAULTS)) {
+    const id  = 'mob-rate-' + clientName.replace(/[^a-z0-9]/gi, '_');
+    const inp = document.getElementById(id);
+    if (!inp) continue;
+    const val = parseInt(inp.value, 10);
+    if (!isNaN(val) && val >= 0) futureClientRates[clientName] = val;
+  }
+  saveFutureRates();
+  const msg = document.getElementById('mob-pricing-saved-msg');
+  if (msg) {
+    msg.textContent = '✓ Future rates saved';
+    msg.classList.add('show');
+    setTimeout(() => { msg.textContent = ''; msg.classList.remove('show'); }, 2500);
+  }
+}
+
+// ── DESKTOP HOME ──────────────────────────────────────────────────────────
 function renderHome() {
   document.getElementById('page-client').style.display  = 'none';
   document.getElementById('page-summary').style.display = 'none';
@@ -901,7 +1838,7 @@ function renderHome() {
   countUp('count-unpaid', g.unpaid,          900);
 }
 
-// ── CLIENT PAGE ───────────────────────────────────────────────────────────
+// ── DESKTOP CLIENT ────────────────────────────────────────────────────────
 function renderClient(clientName) {
   document.getElementById('page-home').style.display    = 'none';
   document.getElementById('page-summary').style.display = 'none';
@@ -978,7 +1915,7 @@ function renderClient(clientName) {
   `;
 }
 
-// ── SUMMARY PAGES ─────────────────────────────────────────────────────────
+// ── DESKTOP SUMMARY ───────────────────────────────────────────────────────
 function renderSummaryPage(type) {
   document.getElementById('page-home').style.display    = 'none';
   document.getElementById('page-client').style.display  = 'none';
@@ -1054,7 +1991,7 @@ function renderSummaryPage(type) {
   `;
 }
 
-// ── PRICING MANAGER ───────────────────────────────────────────────────────
+// ── DESKTOP PRICING ───────────────────────────────────────────────────────
 function renderPricing() {
   document.getElementById('page-home').style.display    = 'none';
   document.getElementById('page-client').style.display  = 'none';
@@ -1070,8 +2007,7 @@ function renderPricing() {
         <span class="pricing-symbol">₱</span>
         <input
           class="pricing-input"
-          type="number"
-          min="0"
+          type="number" min="0"
           id="rate-${clientName.replace(/[^a-z0-9]/gi,'_')}"
           value="${current}"
           data-client="${clientName}"
@@ -1111,12 +2047,6 @@ function renderPricing() {
   `;
 }
 
-function onRateChange(input) {
-  const client = input.getAttribute('data-client');
-  const val    = parseInt(input.value, 10);
-  if (!isNaN(val) && val >= 0) clientRates[client] = val;
-}
-
 function savePricingFromUI() {
   for (const clientName of Object.keys(RATE_DEFAULTS)) {
     const id  = 'rate-' + clientName.replace(/[^a-z0-9]/gi, '_');
@@ -1127,22 +2057,12 @@ function savePricingFromUI() {
     clientRates[clientName] = val;
     futureClientRates[clientName] = val;
     Object.keys(projectPriceSnapshots).forEach(key => {
-      if (key.startsWith(clientName + '||')) {
-        projectPriceSnapshots[key] = val;
-      }
+      if (key.startsWith(clientName + '||')) projectPriceSnapshots[key] = val;
     });
   }
-  saveRates();
-  saveFutureRates();
-  saveProjectSnapshots();
-
+  saveRates(); saveFutureRates(); saveProjectSnapshots();
   const msg = document.getElementById('pricing-saved-msg');
-  if (msg) {
-    msg.textContent = '✓ Rates saved';
-    msg.classList.add('show');
-    setTimeout(() => msg.classList.remove('show'), 2500);
-  }
-
+  if (msg) { msg.textContent = '✓ Rates saved'; msg.classList.add('show'); setTimeout(() => msg.classList.remove('show'), 2500); }
   renderAll();
 }
 
@@ -1152,20 +2072,13 @@ function saveFutureRatesOnly() {
     const inp = document.getElementById(id);
     if (!inp) continue;
     const val = parseInt(inp.value, 10);
-    if (!isNaN(val) && val >= 0) {
-      futureClientRates[clientName] = val;
-    }
+    if (!isNaN(val) && val >= 0) futureClientRates[clientName] = val;
   }
   saveFutureRates();
-
   const msg = document.getElementById('pricing-saved-msg');
   if (msg) {
-    msg.textContent = '✓ Future rates saved';
-    msg.classList.add('show');
-    setTimeout(() => {
-      msg.textContent = '✓ Rates saved';
-      msg.classList.remove('show');
-    }, 2500);
+    msg.textContent = '✓ Future rates saved'; msg.classList.add('show');
+    setTimeout(() => { msg.textContent = '✓ Rates saved'; msg.classList.remove('show'); }, 2500);
   }
 }
 
@@ -1177,7 +2090,9 @@ function resetRates() {
   renderSidebar();
 }
 
-// ── COUNTER ANIMATION ─────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+// COUNTER ANIMATIONS
+// ═══════════════════════════════════════════════════════════════════════════
 function countUp(id, target, duration) {
   const el = document.getElementById(id);
   if (!el) return;
@@ -1191,7 +2106,23 @@ function countUp(id, target, duration) {
   requestAnimationFrame(step);
 }
 
-// ── INIT ──────────────────────────────────────────────────────────────────
+function mobCountUp(id, target, duration, currency = false) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const start = performance.now();
+  function step(now) {
+    const p    = Math.min((now - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - p, 3);
+    const val  = Math.round(ease * target);
+    el.textContent = currency ? val.toLocaleString() : val.toLocaleString();
+    if (p < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════════════
 loadRates();
 loadFutureRates();
 loadProjectOverrides();
